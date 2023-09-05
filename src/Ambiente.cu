@@ -1,7 +1,7 @@
 #include "Ambiente.h"
-#include "Fontes/Macros/MacrosGerais.h"
-#include "Fontes/Macros/MacrosSO.h"
-#include "Fontes/Uteis/RandPerc.h"
+#include "src/Macros/MacrosGerais.h"
+#include "src/Macros/MacrosSO.h"
+#include "src/Uteis/RandPerc.h"
 
 using std::cerr;
 using std::endl;

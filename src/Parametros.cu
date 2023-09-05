@@ -1,6 +1,6 @@
 #include "Parametros.h"
-#include "Fontes/Macros/0_SIM.h"
-#include "Fontes/Macros/MacrosSO.h"
+#include "src/Macros/0_SIM.h"
+#include "src/Macros/MacrosSO.h"
 
 /*
   Construtor da classe Parâmetros, que armazena todos os parâmetros da simulação.

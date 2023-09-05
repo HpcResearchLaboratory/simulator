@@ -1,0 +1,8 @@
+Codigo;Min;Max;Descricao
+MOV001;0.50;0.80;Taxa de Mobilidade para Humano Bebe
+MOV002;0.50;0.80;Taxa de Mobilidade para Humano Crianca
+MOV003;0.50;0.80;Taxa de Mobilidade para Humano Adolescente
+MOV004;0.99;0.99;Taxa de Mobilidade para Humano Jovem
+MOV005;0.99;0.99;Taxa de Mobilidade para Humano Adulto
+MOV006;0.60;0.90;Taxa de Mobilidade para Humano Idoso
+MOV007;0.10;0.10;Percentual de Contato tipo Rede Mundo Pequeno Humanos Infectados

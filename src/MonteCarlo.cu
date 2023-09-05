@@ -1,9 +1,9 @@
 #include "MonteCarlo.h"
-#include "Fontes/Macros/MacrosSO.h"
-#include "Fontes/Parametros.h"
-#include "Fontes/Ambiente.h"
-#include "Fontes/Saidas.h"
-#include "Fontes/Simulacao.h"
+#include "src/Macros/MacrosSO.h"
+#include "src/Parametros.h"
+#include "src/Ambiente.h"
+#include "src/Saidas.h"
+#include "src/Simulacao.h"
 
 /*
   Classe que armazena todos os dados relacionados à uma simulação tipo 

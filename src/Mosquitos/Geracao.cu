@@ -1,12 +1,12 @@
 #include "Geracao.h"
-#include "Fontes/Ambiente.h"
-#include "Fontes/Parametros.h"
-#include "Fontes/Macros/1_MOV_M.h"
-#include "Fontes/Macros/5_GER_M.h"
-#include "Fontes/Mosquitos/Mosquitos.h"
-#include "Fontes/Macros/MacrosMosquitos.h"
-#include "Fontes/Macros/MacrosGerais.h"
-#include "Fontes/Seeds.h"
+#include "src/Ambiente.h"
+#include "src/Parametros.h"
+#include "src/Macros/1_MOV_M.h"
+#include "src/Macros/5_GER_M.h"
+#include "src/Mosquitos/Mosquitos.h"
+#include "src/Macros/MacrosMosquitos.h"
+#include "src/Macros/MacrosGerais.h"
+#include "src/Seeds.h"
 
 /*
   Este operador é paralelizado para cada AGENTE.
