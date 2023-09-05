@@ -1,9 +1,9 @@
 #include "Saidas.h"
-#include "Fontes/Ambiente.h"
-#include "Fontes/Saidas.h"
-#include "Fontes/Mosquitos/Mosquitos.h"
-#include "Fontes/Macros/MacrosMosquitos.h"
-#include "Fontes/Macros/MacrosGerais.h"
+#include "src/Ambiente.h"
+#include "src/Saidas.h"
+#include "src/Mosquitos/Mosquitos.h"
+#include "src/Macros/MacrosMosquitos.h"
+#include "src/Macros/MacrosGerais.h"
 
 /*
   Paralelizado para diferentes combinações de sexo, fase e saúde.

@@ -1,11 +1,11 @@
 #include "Humanos.h"
-#include "Fontes/Uteis/RandPerc.h"
-#include "Fontes/Macros/MacrosGerais.h"
-#include "Fontes/Macros/MacrosSO.h"
-#include "Fontes/Macros/0_INI_H.h"
-#include "Fontes/Macros/MacrosHumanos.h"
-#include "Fontes/Parametros.h"
-#include "Fontes/Ambiente.h"
+#include "src/Uteis/RandPerc.h"
+#include "src/Macros/MacrosGerais.h"
+#include "src/Macros/MacrosSO.h"
+#include "src/Macros/0_INI_H.h"
+#include "src/Macros/MacrosHumanos.h"
+#include "src/Parametros.h"
+#include "src/Ambiente.h"
 
 /*
   Estrutura de dados que representa um agente do tipo humano.

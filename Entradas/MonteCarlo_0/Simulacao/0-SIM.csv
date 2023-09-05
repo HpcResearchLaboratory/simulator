@@ -1,0 +1,5 @@
+Codigo;Min;Max;Descricao
+SIM001;1;1;Quantidade de Simulacoes
+SIM002;365;365;Quantidade de Ciclos por Simulacao
+SIM003;4;4;Quantidade de Subciclos por Periodo
+SIM004;1000.0;1000.0;Proporcao da Quantidade Maxima de Mosquitos

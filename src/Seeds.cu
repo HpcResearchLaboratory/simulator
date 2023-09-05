@@ -1,6 +1,6 @@
 #include "Seeds.h"
-#include "Fontes/Uteis/RandPerc.h"
-#include "Fontes/Macros/MacrosParametros.h"
+#include "src/Uteis/RandPerc.h"
+#include "src/Macros/MacrosParametros.h"
 
 /*
   Operador () da classe InitSeeds.

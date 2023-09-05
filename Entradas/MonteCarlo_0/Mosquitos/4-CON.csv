@@ -1,0 +1,30 @@
+Codigo;Min;Max;Descricao
+CON001;1.0;1.0;Frequencia em Ciclos do Controle Natural dos Mosquitos por Selecao
+CON002;0.085;0.087;Porcentagem Elim Controle Natural por Selecao Machos Ovos sem Wolbachia
+CON003;0.085;0.087;Porcentagem Elim Controle Natural por Selecao Machos Ovos com Wolbachia
+CON004;0.085;0.087;Porcentagem Elim Controle Natural por Selecao Femeas Ovos sem Wolbachia
+CON005;0.085;0.087;Porcentagem Elim Controle Natural por Selecao Femeas Ovos com Wolbachia
+CON006;0.055999999999999994;0.057999999999999996;Porcentagem Elim Controle Natural por Selecao Machos Larvas sem Wolbachia
+CON007;0.055999999999999994;0.057999999999999996;Porcentagem Elim Controle Natural por Selecao Machos Larvas com Wolbachia
+CON008;0.055999999999999994;0.057999999999999996;Porcentagem Elim Controle Natural por Selecao Femeas Larvas sem Wolbachia
+CON009;0.055999999999999994;0.057999999999999996;Porcentagem Elim Controle Natural por Selecao Femeas Larvas com Wolbachia
+CON010;0.055999999999999994;0.057999999999999996;Porcentagem Elim Controle Natural por Selecao Machos Pupas sem Wolbachia
+CON011;0.055999999999999994;0.057999999999999996;Porcentagem Elim Controle Natural por Selecao Machos Pupas com Wolbachia
+CON012;0.055999999999999994;0.057999999999999996;Porcentagem Elim Controle Natural por Selecao Femeas Pupas sem Wolbachia
+CON013;0.055999999999999994;0.057999999999999996;Porcentagem Elim Controle Natural por Selecao Femeas Pupas com Wolbachia
+CON014;0.055999999999999994;0.057999999999999996;Porcentagem Elim Controle Natural por Selecao Machos Ativos sem Wolbachia
+CON015;0.055999999999999994;0.057999999999999996;Porcentagem Elim Controle Natural por Selecao Machos Ativos com Wolbachia
+CON016;0.055999999999999994;0.057999999999999996;Porcentagem Elim Controle Natural por Selecao Femeas Ativas sem Wolbachia
+CON017;0.055999999999999994;0.057999999999999996;Porcentagem Elim Controle Natural por Selecao Femeas Ativas com Wolbachia
+CON018;0.0;0.0;Frequencia em Ciclos do Controle Biologico
+CON019;0.0;0.0;Quantidade de Machos Ativos com Wolbachia Inseridos pelo Controle Biologico
+CON020;0.0;0.0;Quantidade de Femeas Ativas com Wolbachia Inseridas pelo Controle Biologico
+CON021;0.0;0.0;Frequencia em Ciclos do Tratamento Ambiental
+CON022;0.4;0.6;Fracao de Mosquitos Afetados pelo Tratamento Ambiental
+CON023;0.1;0.2;Taxa no Sorteio do Tipo de Influencia (p = parado, 1 - p = espantado)
+CON024;0.016669999999999997;0.016669999999999997;Decaimento Controles Quimicos 
+CON025;0.60;0.65;Multiplicador de Controle para Mosquitos na Fase Aquática (Muito Alto)
+CON026;0.60;0.65;Multiplicador de Controle para Mosquitos na Fase Aquática (Alto)
+CON027;0.60;0.65;Multiplicador de Controle para Mosquitos na Fase Aquática (Regular)
+CON028;0.60;0.65;Multiplicador de Controle para Mosquitos na Fase Aquática (Baixo)
+CON029;0.60;0.65;Multiplicador de Controle para Mosquitos na Fase Aquática (Muito Baixo)

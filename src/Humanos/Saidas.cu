@@ -1,9 +1,9 @@
 #include "Saidas.h"
-#include "Fontes/Ambiente.h"
-#include "Fontes/Saidas.h"
-#include "Fontes/Humanos/Humanos.h"
-#include "Fontes/Macros/MacrosHumanos.h"
-#include "Fontes/Macros/MacrosGerais.h"
+#include "src/Ambiente.h"
+#include "src/Saidas.h"
+#include "src/Humanos/Humanos.h"
+#include "src/Macros/MacrosHumanos.h"
+#include "src/Macros/MacrosGerais.h"
 
 /*
   Paralelizado para diferentes combinações de sexo, saúde e faixa etária.

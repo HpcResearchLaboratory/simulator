@@ -1,12 +1,12 @@
 #include "Controle.h"
-#include "Fontes/Ambiente.h"
-#include "Fontes/Parametros.h"
-#include "Fontes/Seeds.h"
-#include "Fontes/Macros/3_TRA_M.h"
-#include "Fontes/Macros/4_CON_M.h"
-#include "Fontes/Mosquitos/Mosquitos.h"
-#include "Fontes/Macros/MacrosMosquitos.h"
-#include "Fontes/Macros/MacrosGerais.h"
+#include "src/Ambiente.h"
+#include "src/Parametros.h"
+#include "src/Seeds.h"
+#include "src/Macros/3_TRA_M.h"
+#include "src/Macros/4_CON_M.h"
+#include "src/Mosquitos/Mosquitos.h"
+#include "src/Macros/MacrosMosquitos.h"
+#include "src/Macros/MacrosGerais.h"
 #include <stdio.h>
 
 /*

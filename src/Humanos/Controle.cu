@@ -1,10 +1,10 @@
 #include "Controle.h"
-#include "Fontes/Parametros.h"
-#include "Fontes/Seeds.h"
-#include "Fontes/Humanos/Humanos.h"
-#include "Fontes/Macros/MacrosHumanos.h"
-#include "Fontes/Macros/4_CON_H.h"
-#include "Fontes/Macros/MacrosGerais.h"
+#include "src/Parametros.h"
+#include "src/Seeds.h"
+#include "src/Humanos/Humanos.h"
+#include "src/Macros/MacrosHumanos.h"
+#include "src/Macros/4_CON_H.h"
+#include "src/Macros/MacrosGerais.h"
 
 /*
   Este operador é paralelizado para cada AGENTE.

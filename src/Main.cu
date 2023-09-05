@@ -1,8 +1,8 @@
 #include <iostream>
 #include <string>
 
-#include "Fontes/Macros/MacrosSO.h"
-#include "Fontes/MonteCarlo.h"
+#include "src/Macros/MacrosSO.h"
+#include "src/MonteCarlo.h"
 
 using std::cout;
 using std::endl;

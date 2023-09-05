@@ -1,7 +1,7 @@
 #include "Saidas.h"
-#include "Fontes/Ambiente.h"
-#include "Fontes/Parametros.h"
-#include "Fontes/Macros/MacrosGerais.h"
+#include "src/Ambiente.h"
+#include "src/Parametros.h"
+#include "src/Macros/MacrosGerais.h"
 
 /*
   Classe responsável pelo armazenamento de todas as saídas geradas durante a 
