@@ -3,7 +3,7 @@ CXXFLAGS = -std=c++14 -Wno-deprecated-gpu-targets
 LDFLAGS = -dc -I. -c
 MAKEFLAGS += -j
 
-SOURCES = $(shell find Fontes/ -name *.cu)
+SOURCES = $(shell find src/ -name *.cu)
 OBJS = $(SOURCES:%.cu=%.o)
 EXE = AEDES_Acoplado
 
@@ -15,204 +15,204 @@ $(EXE): $(OBJS)
 %.o: %.cu
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $< -o $@
 
-Fontes/Main.o: Fontes/Main.cu \
-							 Fontes/Macros/MacrosSO.h \
-							 Fontes/MonteCarlo.h
+src/Main.o: src/Main.cu \
+							 src/Macros/MacrosSO.h \
+							 src/MonteCarlo.h
 
-Fontes/MonteCarlo.o: Fontes/MonteCarlo.cu \
-										 Fontes/Macros/MacrosSO.h \
-										 Fontes/Parametros.h \
-										 Fontes/Ambiente.h \
-										 Fontes/Saidas.h \
-										 Fontes/Simulacao.h
+src/MonteCarlo.o: src/MonteCarlo.cu \
+										 src/Macros/MacrosSO.h \
+										 src/Parametros.h \
+										 src/Ambiente.h \
+										 src/Saidas.h \
+										 src/Simulacao.h
 
-Fontes/Parametros.o: Fontes/Parametros.cu \
-										 Fontes/Macros/0_SIM.h \
-										 Fontes/Macros/MacrosSO.h
+src/Parametros.o: src/Parametros.cu \
+										 src/Macros/0_SIM.h \
+										 src/Macros/MacrosSO.h
 
-Fontes/Ambiente.o: Fontes/Ambiente.cu \
-									 Fontes/Macros/MacrosGerais.h \
-									 Fontes/Macros/MacrosSO.h \
-									 Fontes/Uteis/RandPerc.h
+src/Ambiente.o: src/Ambiente.cu \
+									 src/Macros/MacrosGerais.h \
+									 src/Macros/MacrosSO.h \
+									 src/Uteis/RandPerc.h
 
-Fontes/Saidas.o: Fontes/Saidas.cu \
-								 Fontes/Ambiente.h \
-								 Fontes/Parametros.h \
-								 Fontes/Macros/MacrosGerais.h
+src/Saidas.o: src/Saidas.cu \
+								 src/Ambiente.h \
+								 src/Parametros.h \
+								 src/Macros/MacrosGerais.h
 
-Fontes/Seeds.o: Fontes/Seeds.cu \
-								Fontes/Uteis/RandPerc.h \
-								Fontes/Macros/MacrosParametros.h
+src/Seeds.o: src/Seeds.cu \
+								src/Uteis/RandPerc.h \
+								src/Macros/MacrosParametros.h
 
-Fontes/Uteis/RandPerc.o: Fontes/Uteis/RandPerc.cu
+src/Uteis/RandPerc.o: src/Uteis/RandPerc.cu
 
-Fontes/Uteis/Timer.o: Fontes/Uteis/Timer.cu
+src/Uteis/Timer.o: src/Uteis/Timer.cu
 
-Fontes/Simulacao.o: Fontes/Simulacao.cu \
-										Fontes/Seeds.h \
-										Fontes/Parametros.h \
-										Fontes/Ambiente.h \
-										Fontes/Uteis/RandPerc.h \
-										Fontes/Saidas.h \
-										Fontes/Macros/MacrosSO.h \
-										Fontes/Macros/MacrosGerais.h \
-                    Fontes/Macros/2_CON_H.h \
-                    Fontes/Macros/3_TRA_H.h \
-                    Fontes/Macros/4_CON_H.h \
-                    Fontes/Macros/3_TRA_M.h \
-										Fontes/Macros/4_CON_M.h \
-                    Fontes/Macros/5_GER_M.h \
-										Fontes/Mosquitos/Mosquitos.h \
-										Fontes/Mosquitos/Movimentacao.h \
-										Fontes/Mosquitos/Contato.h \
-										Fontes/Mosquitos/Transicao.h \
-										Fontes/Mosquitos/Controle.h \
-										Fontes/Mosquitos/Geracao.h \
-										Fontes/Mosquitos/Insercao.h \
-										Fontes/Mosquitos/Saidas.h \
-										Fontes/Humanos/Humanos.h \
-										Fontes/Humanos/Movimentacao.h \
-										Fontes/Humanos/Contato.h \
-										Fontes/Humanos/Transicao.h \
-										Fontes/Humanos/Controle.h \
-										Fontes/Humanos/Insercao.h \
-										Fontes/Humanos/Saidas.h
+src/Simulacao.o: src/Simulacao.cu \
+										src/Seeds.h \
+										src/Parametros.h \
+										src/Ambiente.h \
+										src/Uteis/RandPerc.h \
+										src/Saidas.h \
+										src/Macros/MacrosSO.h \
+										src/Macros/MacrosGerais.h \
+                    src/Macros/2_CON_H.h \
+                    src/Macros/3_TRA_H.h \
+                    src/Macros/4_CON_H.h \
+                    src/Macros/3_TRA_M.h \
+										src/Macros/4_CON_M.h \
+                    src/Macros/5_GER_M.h \
+										src/Mosquitos/Mosquitos.h \
+										src/Mosquitos/Movimentacao.h \
+										src/Mosquitos/Contato.h \
+										src/Mosquitos/Transicao.h \
+										src/Mosquitos/Controle.h \
+										src/Mosquitos/Geracao.h \
+										src/Mosquitos/Insercao.h \
+										src/Mosquitos/Saidas.h \
+										src/Humanos/Humanos.h \
+										src/Humanos/Movimentacao.h \
+										src/Humanos/Contato.h \
+										src/Humanos/Transicao.h \
+										src/Humanos/Controle.h \
+										src/Humanos/Insercao.h \
+										src/Humanos/Saidas.h
 
-Fontes/Mosquitos/Mosquitos.o: Fontes/Mosquitos/Mosquitos.cu \
-															Fontes/Macros/MacrosMosquitos.h \
-															Fontes/Uteis/RandPerc.h \
-															Fontes/Macros/MacrosGerais.h \
-															Fontes/Macros/MacrosSO.h \
-															Fontes/Macros/0_SIM.h \
-															Fontes/Macros/0_INI_M.h \
-															Fontes/Macros/3_TRA_M.h \
-															Fontes/Parametros.h \
-															Fontes/Ambiente.h
+src/Mosquitos/Mosquitos.o: src/Mosquitos/Mosquitos.cu \
+															src/Macros/MacrosMosquitos.h \
+															src/Uteis/RandPerc.h \
+															src/Macros/MacrosGerais.h \
+															src/Macros/MacrosSO.h \
+															src/Macros/0_SIM.h \
+															src/Macros/0_INI_M.h \
+															src/Macros/3_TRA_M.h \
+															src/Parametros.h \
+															src/Ambiente.h
 
-Fontes/Mosquitos/Movimentacao.o: Fontes/Mosquitos/Movimentacao.cu \
-																 Fontes/Ambiente.h \
-																 Fontes/Parametros.h \
-																 Fontes/Seeds.h \
-																 Fontes/Macros/1_MOV_M.h \
-																 Fontes/Mosquitos/Mosquitos.h \
-																 Fontes/Macros/MacrosMosquitos.h \
-																 Fontes/Humanos/Humanos.h \
-																 Fontes/Macros/MacrosHumanos.h \
-																 Fontes/Macros/MacrosGerais.h
+src/Mosquitos/Movimentacao.o: src/Mosquitos/Movimentacao.cu \
+																 src/Ambiente.h \
+																 src/Parametros.h \
+																 src/Seeds.h \
+																 src/Macros/1_MOV_M.h \
+																 src/Mosquitos/Mosquitos.h \
+																 src/Macros/MacrosMosquitos.h \
+																 src/Humanos/Humanos.h \
+																 src/Macros/MacrosHumanos.h \
+																 src/Macros/MacrosGerais.h
 
-Fontes/Mosquitos/Contato.o: Fontes/Mosquitos/Contato.cu \
-														Fontes/Ambiente.h \
-														Fontes/Parametros.h \
-														Fontes/Seeds.h \
-														Fontes/Macros/2_CON_M.h \
-														Fontes/Mosquitos/Mosquitos.h \
-														Fontes/Macros/MacrosMosquitos.h \
-														Fontes/Macros/MacrosGerais.h
+src/Mosquitos/Contato.o: src/Mosquitos/Contato.cu \
+														src/Ambiente.h \
+														src/Parametros.h \
+														src/Seeds.h \
+														src/Macros/2_CON_M.h \
+														src/Mosquitos/Mosquitos.h \
+														src/Macros/MacrosMosquitos.h \
+														src/Macros/MacrosGerais.h
 
-Fontes/Mosquitos/Transicao.o: Fontes/Mosquitos/Transicao.cu \
-															Fontes/Ambiente.h \
-															Fontes/Parametros.h \
-															Fontes/Seeds.h \
-															Fontes/Macros/3_TRA_M.h \
-															Fontes/Mosquitos/Mosquitos.h \
-															Fontes/Macros/MacrosMosquitos.h \
-															Fontes/Macros/MacrosGerais.h
+src/Mosquitos/Transicao.o: src/Mosquitos/Transicao.cu \
+															src/Ambiente.h \
+															src/Parametros.h \
+															src/Seeds.h \
+															src/Macros/3_TRA_M.h \
+															src/Mosquitos/Mosquitos.h \
+															src/Macros/MacrosMosquitos.h \
+															src/Macros/MacrosGerais.h
 
-Fontes/Mosquitos/Controle.o: Fontes/Mosquitos/Controle.cu \
-														 Fontes/Ambiente.h \
-														 Fontes/Parametros.h \
-														 Fontes/Seeds.h \
-														 Fontes/Macros/3_TRA_M.h \
-														 Fontes/Macros/4_CON_M.h \
-														 Fontes/Mosquitos/Mosquitos.h \
-														 Fontes/Macros/MacrosMosquitos.h \
-														 Fontes/Macros/MacrosGerais.h
+src/Mosquitos/Controle.o: src/Mosquitos/Controle.cu \
+														 src/Ambiente.h \
+														 src/Parametros.h \
+														 src/Seeds.h \
+														 src/Macros/3_TRA_M.h \
+														 src/Macros/4_CON_M.h \
+														 src/Mosquitos/Mosquitos.h \
+														 src/Macros/MacrosMosquitos.h \
+														 src/Macros/MacrosGerais.h
 
-Fontes/Mosquitos/Geracao.o: Fontes/Mosquitos/Geracao.cu \
-														Fontes/Parametros.h \
-														Fontes/Macros/1_MOV_M.h \
-														Fontes/Macros/5_GER_M.h \
-														Fontes/Mosquitos/Mosquitos.h \
-														Fontes/Macros/MacrosMosquitos.h \
-														Fontes/Macros/MacrosGerais.h \
-														Fontes/Seeds.h
+src/Mosquitos/Geracao.o: src/Mosquitos/Geracao.cu \
+														src/Parametros.h \
+														src/Macros/1_MOV_M.h \
+														src/Macros/5_GER_M.h \
+														src/Mosquitos/Mosquitos.h \
+														src/Macros/MacrosMosquitos.h \
+														src/Macros/MacrosGerais.h \
+														src/Seeds.h
 
-Fontes/Mosquitos/Insercao.o: Fontes/Mosquitos/Insercao.cu \
-													   Fontes/Ambiente.h \
-												     Fontes/Parametros.h \
-														 Fontes/Seeds.h \
-													   Fontes/Mosquitos/Mosquitos.h \
-													   Fontes/Macros/MacrosMosquitos.h \
-                             Fontes/Macros/0_INI_M.h \
-													   Fontes/Macros/3_TRA_M.h \
-													   Fontes/Macros/MacrosGerais.h
+src/Mosquitos/Insercao.o: src/Mosquitos/Insercao.cu \
+													   src/Ambiente.h \
+												     src/Parametros.h \
+														 src/Seeds.h \
+													   src/Mosquitos/Mosquitos.h \
+													   src/Macros/MacrosMosquitos.h \
+                             src/Macros/0_INI_M.h \
+													   src/Macros/3_TRA_M.h \
+													   src/Macros/MacrosGerais.h
 
-Fontes/Mosquitos/Saidas.o: Fontes/Mosquitos/Saidas.cu \
-													 Fontes/Ambiente.h \
-													 Fontes/Saidas.h \
-													 Fontes/Mosquitos/Mosquitos.h \
-													 Fontes/Macros/MacrosMosquitos.h \
-													 Fontes/Macros/MacrosGerais.h
+src/Mosquitos/Saidas.o: src/Mosquitos/Saidas.cu \
+													 src/Ambiente.h \
+													 src/Saidas.h \
+													 src/Mosquitos/Mosquitos.h \
+													 src/Macros/MacrosMosquitos.h \
+													 src/Macros/MacrosGerais.h
 
-Fontes/Humanos/Humanos.o: Fontes/Humanos/Humanos.cu \
-													Fontes/Macros/MacrosHumanos.h \
-													Fontes/Uteis/RandPerc.h \
-													Fontes/Macros/MacrosGerais.h \
-													Fontes/Macros/MacrosSO.h \
-													Fontes/Macros/0_INI_H.h \
-													Fontes/Parametros.h \
-													Fontes/Ambiente.h
+src/Humanos/Humanos.o: src/Humanos/Humanos.cu \
+													src/Macros/MacrosHumanos.h \
+													src/Uteis/RandPerc.h \
+													src/Macros/MacrosGerais.h \
+													src/Macros/MacrosSO.h \
+													src/Macros/0_INI_H.h \
+													src/Parametros.h \
+													src/Ambiente.h
 
-Fontes/Humanos/Movimentacao.o: Fontes/Humanos/Movimentacao.cu \
-															 Fontes/Ambiente.h \
-															 Fontes/Parametros.h \
-															 Fontes/Seeds.h \
-															 Fontes/Humanos/Humanos.h \
-															 Fontes/Macros/MacrosHumanos.h \
-															 Fontes/Macros/1_MOV_H.h \
-															 Fontes/Macros/MacrosGerais.h
+src/Humanos/Movimentacao.o: src/Humanos/Movimentacao.cu \
+															 src/Ambiente.h \
+															 src/Parametros.h \
+															 src/Seeds.h \
+															 src/Humanos/Humanos.h \
+															 src/Macros/MacrosHumanos.h \
+															 src/Macros/1_MOV_H.h \
+															 src/Macros/MacrosGerais.h
 
-Fontes/Humanos/Contato.o: Fontes/Humanos/Contato.cu \
-													Fontes/Ambiente.h \
-													Fontes/Parametros.h \
-													Fontes/Seeds.h \
-													Fontes/Mosquitos/Mosquitos.h \
-													Fontes/Macros/MacrosMosquitos.h \
-													Fontes/Humanos/Humanos.h \
-													Fontes/Macros/MacrosHumanos.h \
-													Fontes/Macros/0_INI_H.h \
-													Fontes/Macros/2_CON_H.h \
-													Fontes/Macros/MacrosGerais.h
+src/Humanos/Contato.o: src/Humanos/Contato.cu \
+													src/Ambiente.h \
+													src/Parametros.h \
+													src/Seeds.h \
+													src/Mosquitos/Mosquitos.h \
+													src/Macros/MacrosMosquitos.h \
+													src/Humanos/Humanos.h \
+													src/Macros/MacrosHumanos.h \
+													src/Macros/0_INI_H.h \
+													src/Macros/2_CON_H.h \
+													src/Macros/MacrosGerais.h
 
-Fontes/Humanos/Transicao.o: Fontes/Humanos/Transicao.cu \
-														Fontes/Ambiente.h \
-														Fontes/Parametros.h \
-														Fontes/Seeds.h \
-														Fontes/Humanos/Humanos.h \
-														Fontes/Macros/MacrosHumanos.h \
-														Fontes/Macros/3_TRA_H.h \
-														Fontes/Macros/MacrosGerais.h
+src/Humanos/Transicao.o: src/Humanos/Transicao.cu \
+														src/Ambiente.h \
+														src/Parametros.h \
+														src/Seeds.h \
+														src/Humanos/Humanos.h \
+														src/Macros/MacrosHumanos.h \
+														src/Macros/3_TRA_H.h \
+														src/Macros/MacrosGerais.h
 
-Fontes/Humanos/Controle.o: Fontes/Humanos/Controle.cu \
-													 Fontes/Parametros.h \
-													 Fontes/Seeds.h \
-													 Fontes/Humanos/Humanos.h \
-													 Fontes/Macros/MacrosHumanos.h \
-													 Fontes/Macros/4_CON_H.h \
-													 Fontes/Macros/MacrosGerais.h
+src/Humanos/Controle.o: src/Humanos/Controle.cu \
+													 src/Parametros.h \
+													 src/Seeds.h \
+													 src/Humanos/Humanos.h \
+													 src/Macros/MacrosHumanos.h \
+													 src/Macros/4_CON_H.h \
+													 src/Macros/MacrosGerais.h
 
-Fontes/Humanos/Insercao.o: Fontes/Humanos/Insercao.cu \
-													 Fontes/Ambiente.h \
-												   Fontes/Parametros.h \
-													 Fontes/Seeds.h \
-													 Fontes/Humanos/Humanos.h \
-													 Fontes/Macros/MacrosHumanos.h \
-													 Fontes/Macros/5_INS_H.h \
-													 Fontes/Macros/MacrosGerais.h
+src/Humanos/Insercao.o: src/Humanos/Insercao.cu \
+													 src/Ambiente.h \
+												   src/Parametros.h \
+													 src/Seeds.h \
+													 src/Humanos/Humanos.h \
+													 src/Macros/MacrosHumanos.h \
+													 src/Macros/5_INS_H.h \
+													 src/Macros/MacrosGerais.h
 
-Fontes/Humanos/Saidas.o: Fontes/Humanos/Saidas.cu \
-												 Fontes/Ambiente.h \
-												 Fontes/Saidas.h \
-												 Fontes/Humanos/Humanos.h \
-												 Fontes/Macros/MacrosHumanos.h \
-												 Fontes/Macros/MacrosGerais.h
+src/Humanos/Saidas.o: src/Humanos/Saidas.cu \
+												 src/Ambiente.h \
+												 src/Saidas.h \
+												 src/Humanos/Humanos.h \
+												 src/Macros/MacrosHumanos.h \
+												 src/Macros/MacrosGerais.h
