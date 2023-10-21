@@ -50,5 +50,9 @@ Saidas
 *.cubin
 *.fatbin
 
-# End of https://www.toptal.com/developers/gitignore/api/cuda
-
+# Build System
+.cache/
+.xmake/
+build/
+compile_commands.json
+input/
