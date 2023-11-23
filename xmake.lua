@@ -2,7 +2,7 @@
 set_project("simulator")
 set_version("0.1.0")
 set_description("A disease spreading simulator")
-set_languages("c++23")
+set_languages("c++20")
 set_license("MIT")
 set_xmakever("2.8.2")
 
@@ -49,19 +49,33 @@ local simulator_deps = { "thrust" }
 -- add_requires(table.unpack(bench_deps))
 
 -- [[ Project targets ]]
-target("gpu", function()
-	set_kind("binary")
-	add_files("src/simulator/*.cu", "src/simulator/**/*.cu", "src/main.cu")
+target("simulator", function()
+	set_kind("static")
+	add_files("src/simulator/*.cu", "src/simulator/**/*.cu")
 
 	-- compatibility
-	add_cugencodes("native")
-	add_cugencodes("compute_50")
+	-- add_cugencodes("native")
+	-- add_cugencodes("compute_50")
 end)
 
--- target("cpu", function()
---   set_kind("binary")
---   add_files("src/main.cpp")
--- end)
+-- xmake config --use_openmp=false
+option("use_openmp", function()
+	set_default(false)
+	set_showmenu(true)
+	set_description("Use OpenMP for the simulator_cli target")
+end)
+
+target("simulator_cli", function()
+	set_kind("binary")
+	add_files("src/simulator_cli/*.cu", "src/simulator_cli/**/*.cu")
+	add_deps("simulator")
+
+	-- I want a way to specify an option to add this line conditionally
+	-- add_cxxflags("-Xcompiler -fopenmp -DTHRUST_DEVICE_SYSTEM=THRUST_DEVICE_SYSTEM_OMP -lgomp")
+	if has_config("use_openmp") then
+		add_cxxflags("-Xcompiler -fopenmp -DTHRUST_DEVICE_SYSTEM=THRUST_DEVICE_SYSTEM_OMP -lgomp")
+	end
+end)
 
 -- target("test", function() end)
 --

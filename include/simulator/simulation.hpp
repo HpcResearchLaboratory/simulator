@@ -46,7 +46,6 @@ class Simulacao {
   Saidas *saidas;
   Humanos *humanos;
   Mosquitos *mosquitos;
-  // double ref = 0;
   int idLira;
   string saidaM, saidaH, arquivoSaidaOviposicao;
   int saidaSubciclo;
@@ -59,7 +58,6 @@ public:
 
 private:
   void iniciar();
-  // void calcularRt();
   void calcularIdLira();
   void movimentacaoHumanos();
   void movimentacaoMosquitos();

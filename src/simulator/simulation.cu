@@ -132,38 +132,12 @@ Simulacao::~Simulacao() {
   uma vez a cada ciclo.
 */
 void Simulacao::iniciar() {
-
-  // Executa movimentação, contato e transição para estabilizar a população.
-  int CICLOS_SHIFT_POPULACAO = 0;
-  for (ciclo = 1; ciclo < (CICLOS_SHIFT_POPULACAO + 1); ++ciclo) {
-    // cout << "Inicializacao | ";
-    // cout << "Ciclo " << ciclo << " / " << CICLOS_SHIFT_POPULACAO << endl;
-    for (periodo = MANHA; periodo <= NOITE; ++periodo) {
-      cout << "periodo: " << periodo << endl;
-      movimentacaoHumanos();
-      for (subciclo = 0; subciclo < parametros->nSubCiclos; ++subciclo) {
-        // cout << "subciclo: " << subciclo << endl;
-        movimentacaoMosquitos();
-        contatoEntreMosquitos(periodo);
-        contatoEntreMosquitosEHumanos(periodo);
-      }
-    }
-    transicaoFasesMosquitos();
-    transicaoEstadosMosquitos();
-    transicaoEstadosHumanos();
-    controleNaturalMosquitosPorIdade();
-    controleNaturalMosquitosPorSelecao();
-    controleNaturalHumanos();
-    geracao();
-  }
-
-  ciclo = 0;
+  std::cout << "Simulacao " << idSim << "/" << parametros->nSims << std::endl;
 
   // Execução dos ciclos de simulação.
   for (ciclo = 1; ciclo < parametros->nCiclos; ++ciclo) {
-    // cout << "Ciclo " << ciclo << " / " << (parametros->nCiclos - 1) << endl;
-    // calcularRt();
-    calcularIdLira();
+    cout << "Ciclo " << ciclo << " / " << (parametros->nCiclos - 1) << endl;
+    // calcularIdLira();
     computarSaidas();
     saidaOviposicao();
 
@@ -213,96 +187,15 @@ void Simulacao::iniciar() {
   saidaOviposicao();
 }
 
-/*
-void Simulacao::calcularRt() {
-  RandPerc rand;
 
-  // Parâmetros para humanos
-  double beta_h = TAXA_INFECCAO_MOSQUITO_(rand());
-  int S = count_if(
-    humanos->humanosDev->begin(),
-    humanos->humanosDev->end(),
-    HumanoSuscetivel()
-  );
-  int N = humanos->nHumanos - count_if(
-    humanos->humanosDev->begin(),
-    humanos->humanosDev->end(),
-    EstaMortoHumano()
-  );
-  double gamma_h = (PERIODO_EXPOSTO_HUMANO_(CRIANCA, rand()) +
-                    PERIODO_EXPOSTO_HUMANO_(JOVEM, rand()) +
-                    PERIODO_EXPOSTO_HUMANO_(ADULTO, rand()) +
-                    PERIODO_EXPOSTO_HUMANO_(IDOSO, rand())) / 4.0;
-  double mi_h = TAXA_MORTE_NATURAL_(rand());
-  double sigma_h = 1.0 / ((PERIODO_RECUPERADO_HUMANO_(CRIANCA, rand()) +
-                           PERIODO_RECUPERADO_HUMANO_(JOVEM, rand()) +
-                           PERIODO_RECUPERADO_HUMANO_(ADULTO, rand()) +
-                           PERIODO_RECUPERADO_HUMANO_(IDOSO, rand())) / 4.0);
-
-  // Parâmetros para mosquitos
-  double beta_m = (TAXA_INFECCAO_HUMANO_SUSCETIVEL_(CRIANCA, rand()) +
-                   TAXA_INFECCAO_HUMANO_SUSCETIVEL_(JOVEM, rand()) +
-                   TAXA_INFECCAO_HUMANO_SUSCETIVEL_(ADULTO, rand()) +
-                   TAXA_INFECCAO_HUMANO_SUSCETIVEL_(IDOSO, rand())) / 4.0;
-  int m1 = count_if(
-    mosquitos->mosquitosDev->begin(),
-    mosquitos->mosquitosDev->end(),
-    MosquitoFemeaSuscetivelAlado()
-  );
-  int m = count_if(
-    mosquitos->mosquitosDev->begin(),
-    mosquitos->mosquitosDev->end(),
-    MosquitoFemeaAlado()
-  );
-  double gamma_m = 1.0 / (CICLOS_LATENCIA_MOSQUITOS_(rand()));
-  double mi_f = BS_ATIVOS_(rand()) *
-                TAXA_ELIM_CONTROLE_NATURAL_SELECAO_(ATIVA, FEMEA, SAUDAVEL,
-rand()) * ENTRE_FAIXA(ambiente->cli[ciclo].txMinAlados,
-ambiente->cli[ciclo].txMaxAlados, rand()); double fi = AS21_(rand()) / (double)
-(INTERVALO_ENTRE_POSTURAS_FEMEA_(rand()) + CICLOS_GESTACAO_(rand()));
-
-  // I(t) e I(t + 1)
-  double casos_t = ambiente->casos[ciclo - 1];
-  double casos_t_add1 = ambiente->casos[ciclo];
-
-  // Cálculo do ref
-  if (casos_t != 0) {
-    ref = casos_t_add1 / casos_t;
-  }
-
-  // Variáveis para o cálculo de q0 e m_star
-  double sigma_p = BS_PUPAS_(rand());
-  double sigma_l = BS_LARVAS_(rand());
-  double mi_p = 1.0 - sigma_p;
-  double mi_l = 1.0 - sigma_l;
-  //double C = (ambiente->indPosReg[3] - ambiente->indPosReg[2]) *
-ENTRE_FAIXA(20, 30, rand()); double C = 74 * ENTRE_FAIXA(20, 30, rand()); double
-qf = (1.0 - PS21_(rand())) * BS_OVOS_(rand());
-
-  // Cálculo do Q0
-  double a = (sigma_l / (sigma_l + mi_l));
-  double b = (sigma_p / (sigma_p + mi_p));
-  double c = (qf * fi / mi_f);
-  double q0 = (sigma_l * sigma_p * qf * fi) / ((sigma_l + mi_l) * (sigma_p +
-mi_p) * mi_f); double m_star = (sigma_p * sigma_l * C * (1 - 1 / q0)) / (mi_f *
-(sigma_p + mi_p));
-
-  beta_h = (ref * m * pow(N, 2.0) * (gamma_m + mi_f) * (gamma_h + mi_h) *
-(sigma_h + mi_h) * mi_f) / (pow(fi, 2.0) * gamma_h * gamma_m * S * m1 * m_star);
-  beta_h /= beta_m;
-
-  std::cout << ref << "\t" << q0 << "\t" << beta_h << std::endl;
-}
-*/
-
-/*
-  Método responsável por calcular o LIRAa atual de acordo com o ciclo,
-  determinando assim os multiplicadores aplicados no controle de ovos.
-*/
-void Simulacao::calcularIdLira() {
-  double frac = (double)ciclo / parametros->nCiclos;
-  idLira = (int)(frac * ambiente->nLira);
-}
+// /*
+//   Método responsável por calcular o LIRAa atual de acordo com o ciclo,
+//   determinando assim os multiplicadores aplicados no controle de ovos.
+// */
+// void Simulacao::calcularIdLira() {
+//   double frac = (double)ciclo / parametros->nCiclos;
+//   idLira = (int)(frac * ambiente->nLira);
+// }
 
 /*
   Método responsável pela movimentação dos agentes humanos.

@@ -4,10 +4,8 @@
 #include <simulator/macros/os.hpp>
 #include <simulator/monte_carlo.hpp>
 
-using std::cout;
-using std::endl;
-using std::string;
-using std::to_string;
+#include <cuda.h>
+#include <cuda_runtime_api.h>
 
 /*
   Método responsável por apresentar uma tela de ajuda com as opções
@@ -18,8 +16,8 @@ using std::to_string;
   "--nmontecarlos -m": especifica a quantidade de simulações Monte Carlo.
   "--saidasubciclo -s": controla a saída bitstring em períodos e subciclos.
 */
-void help(string exe) {
-  cout << "Uso: " << exe << " <opcoes>\n"
+void help(std::string exe) {
+  std::cout << "Uso: " << exe << " <opcoes>\n"
        << "Opcoes:\n"
        << "\t--help, -h\t\tMostra esta ajuda\n"
        << "\t--device, -d ID_DEVICE\tEspecifica a GPU para execucao\n"
@@ -49,7 +47,7 @@ void help(string exe) {
                    "Entradas/MonteCarlo_{1}", em que "{1}" designa o id da
                    simulação, iniciando em "0" até "quantMCS - 1".
 */
-int main(int argc, char **argv) {
+auto main(int argc, char **argv) -> int {
   int idDevice = 0, quantMCs = 1, saidaSubciclo = 0;
 
   // Interpreta os argumentos passados por linha do comando, se existentes.
@@ -77,19 +75,19 @@ int main(int argc, char **argv) {
   cudaSetDevice(idDevice);
 
   // Exclui a pasta de saída, se já existente.
-  system((EXCLUIR_PASTA + string("Saidas")).c_str());
+  system((EXCLUIR_PASTA + string("output")).c_str());
 
   string entrada, saida;
   for (int idMC = 0; idMC < quantMCs; idMC++) {
-    // O caminho para a pasta de entrada será "Entradas/MonteCarlo_{idMC}/"
+    // O caminho para a pasta de entrada será "input/MonteCarlo_{idMC}/"
     entrada = string("input");
     entrada += SEP;
     entrada += string("MonteCarlo_");
     entrada += to_string(idMC);
     entrada += SEP;
 
-    // O caminho para a pasta de saída será "Saidas/MonteCarlo_{idMC}/"
-    saida = string("Saidas");
+    // O caminho para a pasta de saída será "output/MonteCarlo_{idMC}/"
+    saida = string("output");
     saida += SEP;
     saida += string("MonteCarlo_");
     saida += to_string(idMC);
