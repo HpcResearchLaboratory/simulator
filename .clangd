@@ -1,7 +1,7 @@
 # Fragment common to C and C++ source files
 CompileFlags:
     Add: [-Wall, -I/usr/include, -stdlib=libc++ -std=c++23 -fexperimental-library -lfmt]
-    Remove: [-ccbin=*,-rdc=*,-gencode]
+    Remove: [-ccbin=*,-rdc=*,-gencode,-G]
 
 ---
 # Fragment specific to C++ source files
