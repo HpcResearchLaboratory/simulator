@@ -20,7 +20,7 @@ add_cxxflags("-Wall", "-Wextra", "-Werror", "-Wpedantic", "-std=c++20", "-stdpar
 -- add_asflags("")
 add_ldflags("-L/usr/local/lib", "-L/usr/lib", "-ltbb", { force = true })
 -- add_shflags("")
--- add_arflags(""
+-- add_arflags("")
 set_policy("build.optimization.lto", true)
 set_policy("build.warning", true)
 set_policy("build.merge_archive", true)
@@ -31,6 +31,10 @@ local simulator_deps = { "thrust", "toml++" }
 local simulator_cli_deps = { "cxxopts", "toml++" }
 -- local test_deps = { "gtest" }
 -- local bench_deps = { "benchmark" }
+
+-- https://github.com/marzer/tomlplusplus/issues/213
+add_defines("TOML_RETURN_BOOL_FROM_FOR_EACH_BROKEN=1")
+add_defines("TOML_RETURN_BOOL_FROM_FOR_EACH_BROKEN_ACKNOWLEDGED=1")
 
 add_requires(table.unpack(simulator_deps))
 add_requires(table.unpack(simulator_cli_deps))
@@ -44,13 +48,10 @@ target("simulator", function()
 	set_kind("static")
 	add_files("src/simulator/*.cu", "src/simulator/**/*.cu")
 	add_packages(table.unpack(simulator_deps))
-	-- https://github.com/marzer/tomlplusplus/issues/213
-	add_defines("TOML_RETURN_BOOL_FROM_FOR_EACH_BROKEN=1")
-	add_defines("TOML_RETURN_BOOL_FROM_FOR_EACH_BROKEN_ACKNOWLEDGED=1")
 
 	-- compatibility
-	-- add_cugencodes("native")
-	-- add_cugencodes("compute_50")
+
+	add_cugencodes("sm_75")
 end)
 
 -- xmake config --use_openmp=false
@@ -63,8 +64,8 @@ end)
 target("simulator_cli", function()
 	set_kind("binary")
 	add_files("src/simulator_cli/*.cu", "src/simulator_cli/**/*.cu")
-	add_deps("simulator")
 	add_packages(table.unpack(simulator_cli_deps))
+	add_deps("simulator")
 
 	-- I want a way to specify an option to add this line conditionally
 	-- add_cxxflags("-Xcompiler -fopenmp -DTHRUST_DEVICE_SYSTEM=THRUST_DEVICE_SYSTEM_OMP -lgomp")

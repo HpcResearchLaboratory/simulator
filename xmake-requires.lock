@@ -1,0 +1,47 @@
+{
+    ["linux|x86_64"] = {
+        ["cmake#31fecfc4"] = {
+            repo = {
+                branch = "master",
+                commit = "0d384960d2e3a0b64aa8a25792f4332fa2742c5c",
+                url = "https://github.com/xmake-io/xmake-repo.git"
+            },
+            version = "3.28.1"
+        },
+        ["cuda#7e73ba8e"] = {
+            repo = {
+                branch = "master",
+                commit = "0d384960d2e3a0b64aa8a25792f4332fa2742c5c",
+                url = "https://github.com/xmake-io/xmake-repo.git"
+            },
+            version = "latest"
+        },
+        ["cxxopts#31fecfc4"] = {
+            repo = {
+                branch = "master",
+                commit = "bf40fc940bdd335a7fd809499bb75030aadb0451",
+                url = "https://github.com/xmake-io/xmake-repo.git"
+            },
+            version = "v3.1.1"
+        },
+        ["thrust#31fecfc4"] = {
+            repo = {
+                branch = "master",
+                commit = "0d384960d2e3a0b64aa8a25792f4332fa2742c5c",
+                url = "https://github.com/xmake-io/xmake-repo.git"
+            },
+            version = "2.1.0"
+        },
+        ["toml++#31fecfc4"] = {
+            repo = {
+                branch = "master",
+                commit = "0d384960d2e3a0b64aa8a25792f4332fa2742c5c",
+                url = "https://github.com/xmake-io/xmake-repo.git"
+            },
+            version = "v3.4.0"
+        }
+    },
+    __meta__ = {
+        version = "1.0"
+    }
+}

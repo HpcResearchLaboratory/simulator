@@ -1,4 +1,6 @@
+#include <simulator/environment.hpp>
 #include <simulator/monte_carlo.hpp>
+#include <simulator/output.hpp>
 #include <simulator/parameters.hpp>
 
 #include <cuda_runtime.h>
@@ -22,22 +24,26 @@ auto main(int argc, char** argv) -> int {
   ;
   // clang-format on
 
-  auto result = options.parse(argc, argv);
+  const auto result = options.parse(argc, argv);
   if (result.count("help")) {
     std::cout << options.help() << std::endl;
     std::exit(0);
   }
 
-  // auto device = result["device"].as<int>();
-  // auto number_of_simulations = result["number_of_mc_simulations"].as<int>();
+  const auto device = result["device"].as<int>();
+  const auto number_of_simulations =
+    result["number_of_mc_simulations"].as<int>();
   // auto subcycle_output = result["subcycle_output"].as<bool>();
 
-  auto parameters = simulator::Parameters::from_dir("assets/input/parameters");
+  cudaSetDevice(device);
+  for (int i = 0; i < number_of_simulations; ++i) {
+    const auto parameters = simulator::Parameters::from_dir(
+      "assets/input/mc" + std::to_string(i) + "/parameters");
+    const auto environment = simulator::Environment::from_dir(
+      "assets/input/mc" + std::to_string(i) + "/environment");
+    const auto output =
+      simulator::Output::from_dir("assets/output/mc" + std::to_string(i));
 
-  // cudaSetDevice(device);
-  // for (int i = 0; i < number_of_simulations; ++i)
-  //   simulator::MonteCarlo { "assets/input/mc" + std::to_string(i),
-  //                           "assets/output/mc" + std::to_string(i),
-  //                           subcycle_output }
-  //     .run();
+    simulator::MonteCarlo { parameters, environment, output }.run();
+  }
 }
