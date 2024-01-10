@@ -1,5 +1,7 @@
 #pragma once
 
+#include <simulator/util/random.hpp>
+
 #include <filesystem>
 #include <toml++/toml.hpp>
 

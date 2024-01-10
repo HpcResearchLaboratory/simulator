@@ -1,0 +1,33 @@
+[mosquitoes.transition]
+mosquito_egg_age = { min = 0, max = 9 }
+mosquito_larva_age = { min = 9, max = 13 }
+mosquito_pupa_age = { min = 13, max = 15 }
+
+healthy_active_male_mosquito_age = { min = 15, max = 40 }
+wolbachia_male_mosquito_age = { min = 15, max = 20 }
+healthy_active_female_mosquito_age = { min = 15, max = 40 }
+wolbachia_female_mosquito_age = { min = 15, max = 20 }
+healthy_decadent_male_mosquito_age = { min = 40, max = 56 }
+wolbachia_decadent_male_mosquito_age = { min = 20, max = 30 }
+healthy_decadent_female_mosquito_age = { min = 40, max = 56 }
+wolbachia_decadent_female_mosquito_age = { min = 20, max = 30 }
+
+male_mosquito_egg_to_larva_survival_no_wolbachia = { min = 1.00, max = 1.00 }
+male_mosquito_egg_to_larva_survival_with_wolbachia = { min = 1.00, max = 1.00 }
+female_mosquito_egg_to_larva_survival_no_wolbachia = { min = 1.00, max = 1.00 }
+female_mosquito_egg_to_larva_survival_with_wolbachia = { min = 1.00, max = 1.00 }
+male_mosquito_larva_to_pupa_survival_no_wolbachia = { min = 0.95, max = 0.95 }
+male_mosquito_larva_to_pupa_survival_with_wolbachia = { min = 0.95, max = 0.95 }
+female_mosquito_larva_to_pupa_survival_no_wolbachia = { min = 0.95, max = 0.95 }
+female_mosquito_larva_to_pupa_survival_with_wolbachia = { min = 0.95, max = 0.95 }
+male_mosquito_pupa_to_active_survival_no_wolbachia = { min = 0.95, max = 0.95 }
+male_mosquito_pupa_to_active_survival_with_wolbachia = { min = 0.95, max = 0.95 }
+female_mosquito_pupa_to_active_survival_no_wolbachia = { min = 0.95, max = 0.95 }
+female_mosquito_pupa_to_active_survival_with_wolbachia = { min = 0.95, max = 0.95 }
+male_mosquito_active_to_decadent_survival_no_wolbachia = { min = 0.95, max = 0.95 }
+male_mosquito_active_to_decadent_survival_with_wolbachia = { min = 0.95, max = 0.95 }
+female_mosquito_active_to_decadent_survival_no_wolbachia = { min = 0.95, max = 0.95 }
+female_mosquito_active_to_decadent_survival_with_wolbachia = { min = 0.95, max = 0.95 }
+
+dengue_infected_mosquito_max_age = { min = 42, max = 56 }
+latency_cycles_for_mosquitoes = { min = 8, max = 12 }

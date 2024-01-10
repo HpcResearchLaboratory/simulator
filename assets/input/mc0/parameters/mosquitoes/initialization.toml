@@ -1,0 +1,21 @@
+[mosquitoes.initialization]
+non_flying_male_mosquitoes_susceptible = { min = 240, max = 240 }
+active_male_mosquitoes_susceptible = { min = 480, max = 480 }
+decaying_male_mosquitoes_susceptible = { min = 120, max = 120 }
+non_flying_female_mosquitoes_susceptible = { min = 288, max = 288 }
+active_female_mosquitoes_susceptible = { min = 576, max = 576 }
+decaying_female_mosquitoes_susceptible = { min = 144, max = 144 }
+
+non_flying_male_mosquitoes_with_wolbachia = { min = 0, max = 0 }
+active_male_mosquitoes_with_wolbachia = { min = 0, max = 0 }
+decaying_male_mosquitoes_with_wolbachia = { min = 0, max = 0 }
+non_flying_female_mosquitoes_with_wolbachia = { min = 0, max = 0 }
+active_female_mosquitoes_with_wolbachia = { min = 0, max = 0 }
+decaying_female_mosquitoes_with_wolbachia = { min = 0, max = 0 }
+
+active_female_mosquitoes_with_dengue_serotype_1 = { min = 0, max = 0 }
+active_female_mosquitoes_with_dengue_serotype_2 = { min = 0, max = 0 }
+active_female_mosquitoes_with_dengue_serotype_3 = { min = 0, max = 0 }
+active_female_mosquitoes_with_dengue_serotype_4 = { min = 0, max = 0 }
+
+initial_mosquito_distribution_probability = { min = 0.1, max = 0.2 }

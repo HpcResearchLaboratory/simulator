@@ -1,15 +1,20 @@
 #pragma once
 
-#include <cstdint>
+#include <simulator/environment.hpp>
+#include <simulator/output.hpp>
+#include <simulator/parameters.hpp>
 
 namespace simulator {
   class Simulation {
-    std::uint32_t number_simulations;
+    const std::uint64_t id;
+
+    const Parameters& parameters;
+    const Environment& environment;
+    const Output& output;
 
   public:
+    Simulation(std::uint64_t id, const Parameters& parameters,
+               const Environment& environment, const Output& output);
     auto run() const -> void;
-    [[nodiscard]] auto get_number_simulations() const -> std::uint32_t {
-      return number_simulations;
-    }
   };
 } // namespace simulator

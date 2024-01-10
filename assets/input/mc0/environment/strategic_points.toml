@@ -1,0 +1,14 @@
+strategic_points = [
+  { quadra = "Q36", lote = "L3237" },
+  { quadra = "Q34", lote = "L3212" },
+  { quadra = "Q36", lote = "L3304" },
+  { quadra = "Q34", lote = "L3171" },
+  { quadra = "Q34", lote = "L3203" },
+  { quadra = "Q37", lote = "L3186" },
+  { quadra = "Q34", lote = "L3195" },
+  { quadra = "Q34", lote = "L3291" },
+  { quadra = "Q37", lote = "L3160" },
+  { quadra = "Q36", lote = "L3280" },
+  { quadra = "Q34", lote = "L3288" },
+  { quadra = "Q36", lote = "L3306" },
+]

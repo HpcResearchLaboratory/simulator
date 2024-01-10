@@ -1,0 +1,8 @@
+[humans.initialization]
+distribution = [
+  { movement_type = "r", gender = "m", age_group = "a", state = "s", serotype = 1, quantity = { min = 10, max = 100 } },
+]
+random_distribution_probability = { min = 0.01, max = 0.03 }
+asymptomatic_probability = { min = 0.01, max = 0.03 }
+predominant_serotype = 2
+predominant_serotype_probability = { min = 0.95, max = 0.99 }

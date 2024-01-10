@@ -2,19 +2,21 @@
 #include <simulator/monte_carlo.hpp>
 #include <simulator/parameters.hpp>
 
-#include <filesystem>
-
 namespace simulator {
-  namespace fs = std::filesystem;
 
-  MonteCarlo::MonteCarlo(fs::path input_path, fs::path output_path,
-                         bool subcycle_output)
-    : input_path(std::move(input_path)), output_path(std::move(output_path)),
-      subcycle_output(subcycle_output) {
-    fs::create_directories(this->output_path);
-    auto parameters = Parameters::from_dir(this->input_path / "parameters");
-    auto environment = Environment::from_dir(this->input_path / "environment");
-  };
+  MonteCarlo::MonteCarlo(Parameters parameters, Environment environment,
+                         Output output)
+    : parameters(std::move(parameters)), environment(std::move(environment)),
+      output(std::move(output)) {}
 
-  auto MonteCarlo::run() const -> void {}
+  auto MonteCarlo::run() const -> void {
+    const auto number_of_simulations =
+      *parameters.table["simulation"]["number_of_simulations"]
+         .as<std::int64_t>();
+
+    for (auto i = 0ull; i < number_of_simulations; ++i) {
+      const auto simulation = Simulation { i, parameters, environment, output };
+      simulation.run();
+    }
+  }
 } // namespace simulator

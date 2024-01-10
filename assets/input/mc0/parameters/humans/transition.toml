@@ -1,0 +1,36 @@
+[humans.transition]
+cycles_for_exposed_baby = { min = 5, max = 7 }
+cycles_for_exposed_child = { min = 5, max = 7 }
+cycles_for_exposed_adolescent = { min = 5, max = 7 }
+cycles_for_exposed_young_adult = { min = 5, max = 7 }
+cycles_for_exposed_adult = { min = 5, max = 7 }
+cycles_for_exposed_elderly = { min = 5, max = 7 }
+
+cycles_for_infected_baby = { min = 6, max = 8 }
+cycles_for_infected_child = { min = 6, max = 8 }
+cycles_for_infected_adolescent = { min = 6, max = 8 }
+cycles_for_infected_young_adult = { min = 6, max = 8 }
+cycles_for_infected_adult = { min = 6, max = 8 }
+cycles_for_infected_elderly = { min = 6, max = 8 }
+
+cycles_for_hemorrhagic_baby = { min = 7, max = 10 }
+cycles_for_hemorrhagic_child = { min = 7, max = 10 }
+cycles_for_hemorrhagic_adolescent = { min = 7, max = 10 }
+cycles_for_hemorrhagic_young_adult = { min = 7, max = 10 }
+cycles_for_hemorrhagic_adult = { min = 7, max = 10 }
+cycles_for_hemorrhagic_elderly = { min = 7, max = 10 }
+
+cycles_for_recovered_baby = { min = 40, max = 45 }
+cycles_for_recovered_child = { min = 40, max = 45 }
+cycles_for_recovered_adolescent = { min = 40, max = 45 }
+cycles_for_recovered_young_adult = { min = 40, max = 45 }
+cycles_for_recovered_adult = { min = 40, max = 45 }
+cycles_for_recovered_elderly = { min = 40, max = 45 }
+
+probability_dengue_hemorrhagic_evolution_1_serotype = { min = 0.00, max = 0.00 }
+probability_dengue_hemorrhagic_evolution_2_serotypes = { min = 0.00, max = 0.00 }
+probability_dengue_hemorrhagic_evolution_3_serotypes = { min = 0.00, max = 0.00 }
+probability_dengue_hemorrhagic_evolution_4_serotypes = { min = 0.00, max = 0.00 }
+probability_death_by_dengue_hemorrhagic = { min = 0.00, max = 0.00 }
+
+vaccine_efficacy_rate = { min = 0.60, max = 0.70 }

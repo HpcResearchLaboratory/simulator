@@ -1,11 +1,19 @@
-Checks:          '-*,readability-identifier-naming,clang-diagnostic-*,clang-analyzer-*'
+Checks:          '-*,readability-identifier-naming,clang-diagnostic-*,clang-analyzer-*,readability-const-return-type,readability-make-member-function-const,cppcoreguidelines-avoid-non-const-global-variables,cppcoreguidelines-interfaces-global-init,modernize-use-auto,misc-const-correctness'
 WarningsAsErrors: ''
 HeaderFilterRegex: ''
-AnalyzeTemporaryDtors: false
 FormatStyle:     none
 User:            pablo951_br
 CheckOptions:
-
+  - key:             readability-const-return-type.WarnOnAllNonConstReturns
+    value:           '1'
+  - key:             readability-make-member-function-const.AllConst
+    value:           '1'
+  - key:             cppcoreguidelines-avoid-non-const-global-variables.AllowConstGlobals
+    value:           '1'
+  - key:             modernize-use-auto.AddConstToQualified
+    value:           '1'
+  - key:             misc-const-correctness.StrictnessLevel
+    value:           'High'
   - key: readability-identifier-naming.NamespaceCase,
     value: lower_case
   - key: readability-identifier-naming.ClassCase,

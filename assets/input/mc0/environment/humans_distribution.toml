@@ -1,0 +1,9 @@
+humans_cases_distribution = [
+  { block = 1, group = 0, x = 255135, y = 7241700, gender = "f", age_group = "a", state = "i", serotype = 2, cycle = 35 },
+  { block = 1, group = 24, x = 255360, y = 7241295, gender = "m", age_group = "y", state = "i", serotype = 2, cycle = 155 },
+  { block = 0, group = 10, x = 255030, y = 7241340, gender = "f", age_group = "I", state = "i", serotype = 2, cycle = 156 },
+  { block = 0, group = 27, x = 255240, y = 7240875, gender = "f", age_group = "a", state = "i", serotype = 2, cycle = 179 },
+  { block = 0, group = 9, x = 255420, y = 7241685, gender = "f", age_group = "y", state = "i", serotype = 2, cycle = 247 },
+  { block = 2, group = 40, x = 255600, y = 7242075, gender = "m", age_group = "a", state = "i", serotype = 2, cycle = 256 },
+  { block = 0, group = 15, x = 255120, y = 7241460, gender = "m", age_group = "y", state = "i", serotype = 2, cycle = 261 },
+]

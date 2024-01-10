@@ -1,0 +1,15 @@
+[humans.insertion]
+entry_cycle_susceptible_humans = { min = 0, max = 0 }
+number_of_susceptible_adult_males_inserted = { min = 0, max = 0 }
+
+entry_cycle_infected_humans_serotype_1_male_adults = { min = 0, max = 0 }
+number_of_humans_serotype_1_male_adults_inserted = { min = 0, max = 0 }
+
+entry_cycle_infected_humans_serotype_2_male_adults = { min = 0, max = 0 }
+number_of_humans_serotype_2_male_adults_inserted = { min = 0, max = 0 }
+
+entry_cycle_infected_humans_serotype_3_male_adults = { min = 0, max = 0 }
+number_of_humans_serotype_3_male_adults_inserted = { min = 0, max = 0 }
+
+entry_cycle_infected_humans_serotype_4_male_adults = { min = 0, max = 0 }
+number_of_humans_serotype_4_male_adults_inserted = { min = 0, max = 0 }

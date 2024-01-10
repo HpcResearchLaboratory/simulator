@@ -1,0 +1,8 @@
+[humans.movement]
+mobility_rate_baby = { min = 0.50, max = 0.80 }
+mobility_rate_child = { min = 0.50, max = 0.80 }
+mobility_rate_adolescent = { min = 0.50, max = 0.80 }
+mobility_rate_young_adult = { min = 0.99, max = 0.99 }
+mobility_rate_adult = { min = 0.99, max = 0.99 }
+mobility_rate_elderly = { min = 0.60, max = 0.90 }
+small_world_network_contact_percentage_infected = { min = 0.10, max = 0.10 }
