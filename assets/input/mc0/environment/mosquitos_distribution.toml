@@ -1,0 +1,8 @@
+mosquitos_cases_distribution = [
+  { block = 2, total = 1, gender = "f", phase = "a", infected_rate = { min = 1.0, max = 1.0 }, serotype = 2, cycle = 264 },
+  { block = 2, total = 1, gender = "f", phase = "a", infected_rate = { min = 1.0, max = 1.0 }, serotype = 2, cycle = 217 },
+  { block = 1, total = 1, gender = "f", phase = "a", infected_rate = { min = 1.0, max = 1.0 }, serotype = 2, cycle = 338 },
+  { block = 2, total = 1, gender = "f", phase = "a", infected_rate = { min = 1.0, max = 1.0 }, serotype = 2, cycle = 261 },
+  { block = 2, total = 1, gender = "f", phase = "a", infected_rate = { min = 1.0, max = 1.0 }, serotype = 2, cycle = 196 },
+  { block = 1, total = 1, gender = "f", phase = "a", infected_rate = { min = 1.0, max = 1.0 }, serotype = 2, cycle = 259 },
+]

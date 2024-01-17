@@ -1,4 +1,4 @@
-[mosquitoes.contact]
+[mosquitos.contact]
 healthy_active_female_and_healthy_active_male_prob = { min = 0.90, max = 0.99 }
 healthy_active_female_and_healthy_decadent_male_prob = { min = 0.80, max = 0.90 }
 

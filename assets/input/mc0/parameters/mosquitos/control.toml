@@ -1,4 +1,4 @@
-[mosquitoes.control]
+[mosquitos.control]
 natural_control_frequency_cycles = { min = 1.0, max = 1.0 }
 
 natural_control_selection_male_eggs_without_wolbachia_percentage = { min = 0.085, max = 0.087 }

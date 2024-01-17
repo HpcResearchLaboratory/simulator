@@ -36,25 +36,25 @@ namespace simulator {
       type4
     };
 
+    std::int64_t id;
+    std::int64_t route;
+    std::int64_t path;
+    bool has_moved_this_cycle;
+    std::int64_t movement_count;
     MovementType movement_type;
+    std::int64_t repast_count;
     Gender gender;
     AgeGroup age_group;
     State state;
     std::optional<Serotype> serotype;
-
-    std::uint64_t route_id;
-    std::uint64_t path_id;
-    bool has_moved_this_cycle;
-    std::uint64_t movement_count;
-    std::uint64_t repast_count;
     std::set<Serotype> serotypes_contracted;
-    bool assintomatic;
-    std::uint64_t state_transition_count;
-    std::uint64_t vaccination_count;
-    std::uint64_t latitudinal_index;
-    std::uint64_t longitudinal_index;
-    std::uint64_t block_id;
-    std::uint64_t location_id;
+    bool is_assymptomatic;
+    std::int64_t state_transition_count;
+    std::int64_t vaccination_count;
+    std::int64_t x;
+    std::int64_t y;
+    std::int64_t block;
+    std::int64_t group;
   };
 
 } // namespace simulator

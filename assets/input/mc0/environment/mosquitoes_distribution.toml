@@ -1,8 +1,0 @@
-mosquitoes_cases_distribution = [
-  { Quadra = 2, QuantidadeTotal = 1, Sexo = "F", Fase = "A", PercentualMinimoInfectados = 1.0, PercentualMaximoInfectados = 1.0, Sorotipo = 2, Ciclo = 264 },
-  { Quadra = 2, QuantidadeTotal = 1, Sexo = "F", Fase = "A", PercentualMinimoInfectados = 1.0, PercentualMaximoInfectados = 1.0, Sorotipo = 2, Ciclo = 217 },
-  { Quadra = 1, QuantidadeTotal = 1, Sexo = "F", Fase = "A", PercentualMinimoInfectados = 1.0, PercentualMaximoInfectados = 1.0, Sorotipo = 2, Ciclo = 338 },
-  { Quadra = 2, QuantidadeTotal = 1, Sexo = "F", Fase = "A", PercentualMinimoInfectados = 1.0, PercentualMaximoInfectados = 1.0, Sorotipo = 2, Ciclo = 261 },
-  { Quadra = 2, QuantidadeTotal = 1, Sexo = "F", Fase = "A", PercentualMinimoInfectados = 1.0, PercentualMaximoInfectados = 1.0, Sorotipo = 2, Ciclo = 196 },
-  { Quadra = 1, QuantidadeTotal = 1, Sexo = "F", Fase = "A", PercentualMinimoInfectados = 1.0, PercentualMaximoInfectados = 1.0, Sorotipo = 2, Ciclo = 259 },
-]

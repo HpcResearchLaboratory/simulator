@@ -1,4 +1,4 @@
-[mosquitoes.movement]
+[mosquitos.movement]
 daytime_mobility_rate_male_mosquito = { min = 0.99, max = 0.99 }
 daytime_mobility_rate_female_mosquito = { min = 0.99, max = 0.99 }
 nighttime_mobility_rate_male_mosquito = { min = 0.05, max = 0.15 }

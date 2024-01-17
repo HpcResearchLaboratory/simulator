@@ -15,7 +15,10 @@ namespace simulator {
          .as<std::int64_t>();
 
     for (auto i = 0ull; i < number_of_simulations; ++i) {
-      const auto simulation = Simulation { i, parameters, environment, output };
+      const auto humans = Humans { parameters, environment };
+      const auto mosquitos = Mosquitos { parameters, environment };
+      auto simulation =
+        Simulation { i, parameters, environment, output, humans, mosquitos };
       simulation.run();
     }
   }

@@ -1,7 +1,5 @@
-[mosquitoes.transition]
-mosquito_egg_age = { min = 0, max = 9 }
-mosquito_larva_age = { min = 9, max = 13 }
-mosquito_pupa_age = { min = 13, max = 15 }
+[mosquitos.transition]
+ages = { e = { min = 0, max = 9 }, l = { min = 9, max = 13 }, p = { min = 13, max = 15 }, a = { min = 15, max = 40 }, d = { min = 40, max = 56 } }
 
 healthy_active_male_mosquito_age = { min = 15, max = 40 }
 wolbachia_male_mosquito_age = { min = 15, max = 20 }
