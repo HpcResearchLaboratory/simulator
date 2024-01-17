@@ -404,7 +404,7 @@ namespace simulator {
       .paths_indexes = paths_indexes,
       .periods_indexes = periods_indexes,
       .path_age_groups_indexes = paths_age_groups_indexes,
-      .strategic_points_indexes = strategic_points_indexes,
+      .strategic_points = strategic_points_indexes,
       .focus_points_indexes = focus_points_indexes,
       .focus_points = focus_points_array,
       .complement = complement,

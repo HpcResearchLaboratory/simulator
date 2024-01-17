@@ -1,18 +1,18 @@
 #pragma once
 
 #include <simulator/environment.hpp>
-#include <simulator/human/human.hpp>
+#include <simulator/mosquito/mosquito.hpp>
 #include <simulator/parameters.hpp>
 
 namespace simulator {
 
-  class Humans {
+  class Mosquitos {
     const Parameters& parameters;
     const Environment& environment;
-    std::vector<Human> humans;
+    std::vector<Mosquito> mosquitos;
     void update_indexes();
 
   public:
-    Humans(const Parameters& parameters, const Environment& environment);
+    Mosquitos(const Parameters& parameters, const Environment& environment);
   };
 } // namespace simulator

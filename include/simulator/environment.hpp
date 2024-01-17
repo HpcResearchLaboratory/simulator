@@ -108,7 +108,7 @@ namespace simulator {
 
     // ============================Control===========================
     // strategic_points
-    std::vector<std::int64_t> strategic_points_indexes;
+    std::vector<std::int64_t> strategic_points;
     // focal_points
     std::vector<std::int64_t> focus_points_indexes;
     std::vector<std::int64_t> focus_points;

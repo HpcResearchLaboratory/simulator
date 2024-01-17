@@ -30,4 +30,10 @@ namespace simulator::util {
                                              table->at("max").value_or(T {}))();
   }
 
+  template <typename T>
+    requires std::is_arithmetic_v<T>
+  auto random_value_between(const T min, const T max) -> T {
+    return make_random_generator_in_range<T>(min, max)();
+  }
+
 } // namespace simulator::util

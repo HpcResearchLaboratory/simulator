@@ -1,7 +1,10 @@
 #include <simulator/environment.hpp>
+#include <simulator/human/humans.hpp>
 #include <simulator/monte_carlo.hpp>
+#include <simulator/mosquito/mosquitos.hpp>
 #include <simulator/output.hpp>
 #include <simulator/parameters.hpp>
+#include <simulator/simulation.hpp>
 
 #include <cuda_runtime.h>
 #include <curand.h>
@@ -31,19 +34,31 @@ auto main(int argc, char** argv) -> int {
   }
 
   const auto device = result["device"].as<int>();
-  const auto number_of_simulations =
-    result["number_of_mc_simulations"].as<int>();
+  // const auto number_of_simulations =
+  //   result["number_of_mc_simulations"].as<int>();
   // auto subcycle_output = result["subcycle_output"].as<bool>();
 
   cudaSetDevice(device);
-  for (int i = 0; i < number_of_simulations; ++i) {
-    const auto parameters = simulator::Parameters::from_dir(
-      "assets/input/mc" + std::to_string(i) + "/parameters");
-    const auto environment = simulator::Environment::from_dir(
-      "assets/input/mc" + std::to_string(i) + "/environment");
-    const auto output =
-      simulator::Output::from_dir("assets/output/mc" + std::to_string(i));
+  // for (int i = 0; i < number_of_simulations; ++i) {
+  //   const auto parameters = simulator::Parameters::from_dir(
+  //     "assets/input/mc" + std::to_string(i) + "/parameters");
+  //   const auto environment = simulator::Environment::from_dir(
+  //     "assets/input/mc" + std::to_string(i) + "/environment");
+  //   const auto output =
+  //     simulator::Output::from_dir("assets/output/mc" + std::to_string(i));
+  //
+  //   simulator::MonteCarlo { parameters, environment, output }.run();
+  // }
 
-    simulator::MonteCarlo { parameters, environment, output }.run();
-  }
+  const auto parameters =
+    simulator::Parameters::from_dir("assets/input/mc0/parameters");
+  const auto environment =
+    simulator::Environment::from_dir("assets/input/mc0/environment");
+  const auto output = simulator::Output::from_dir("assets/output/mc0");
+
+  const auto humans = simulator::Humans { parameters, environment };
+  const auto mosquitos = simulator::Mosquitos { parameters, environment };
+  auto simulation = simulator::Simulation { 0,      parameters, environment,
+                                            output, humans,     mosquitos };
+  simulation.run();
 }
