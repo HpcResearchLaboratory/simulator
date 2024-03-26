@@ -6,10 +6,6 @@
 #include <simulator/parameters.hpp>
 #include <simulator/simulation.hpp>
 
-#include <cuda_runtime.h>
-#include <curand.h>
-
-#include <cstddef>
 #include <cstdlib>
 #include <iostream>
 
@@ -20,7 +16,6 @@ auto main(int argc, char** argv) -> int {
                            "Command line disease spread simulator");
   // clang-format off
   options.add_options()
-    ("d,device", "CUDA device to run", cxxopts::value<int>()->default_value("0"))
     ("n,number_of_mc_simulations", "Number of simulations to run in the monte carlo strategy", cxxopts::value<int>()->default_value("1"))
     ("s,subcycle_output", "Wheather to print or not data in every subcycle", cxxopts::value<bool>()->default_value("false"))
     ("h,help", "Print help")
@@ -33,12 +28,10 @@ auto main(int argc, char** argv) -> int {
     std::exit(0);
   }
 
-  const auto device = result["device"].as<int>();
   // const auto number_of_simulations =
   //   result["number_of_mc_simulations"].as<int>();
   // auto subcycle_output = result["subcycle_output"].as<bool>();
 
-  cudaSetDevice(device);
   // for (int i = 0; i < number_of_simulations; ++i) {
   //   const auto parameters = simulator::Parameters::from_dir(
   //     "assets/input/mc" + std::to_string(i) + "/parameters");
@@ -57,8 +50,8 @@ auto main(int argc, char** argv) -> int {
   const auto output = simulator::Output::from_dir("assets/output/mc0");
 
   const auto humans = simulator::Humans { parameters, environment };
-  const auto mosquitos = simulator::Mosquitos { parameters, environment };
-  auto simulation = simulator::Simulation { 0,      parameters, environment,
-                                            output, humans,     mosquitos };
-  simulation.run();
+  // const auto mosquitos = simulator::Mosquitos { parameters, environment };
+  // auto simulation = simulator::Simulation { 0,      parameters, environment,
+  //                                           output, humans,     mosquitos };
+  // simulation.run();
 }

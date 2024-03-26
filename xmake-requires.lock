@@ -1,47 +1,31 @@
 {
+    __meta__ = {
+        version = "1.0"
+    },
     ["linux|x86_64"] = {
         ["cmake#31fecfc4"] = {
             repo = {
                 branch = "master",
-                commit = "0d384960d2e3a0b64aa8a25792f4332fa2742c5c",
-                url = "https://github.com/xmake-io/xmake-repo.git"
+                commit = "fd63520c7b8880a41eff7f69920fac70f300468d",
+                url = "https://gitlab.com/tboox/xmake-repo.git"
             },
-            version = "3.28.1"
-        },
-        ["cuda#7e73ba8e"] = {
-            repo = {
-                branch = "master",
-                commit = "0d384960d2e3a0b64aa8a25792f4332fa2742c5c",
-                url = "https://github.com/xmake-io/xmake-repo.git"
-            },
-            version = "latest"
+            version = "3.29.0"
         },
         ["cxxopts#31fecfc4"] = {
             repo = {
                 branch = "master",
-                commit = "bf40fc940bdd335a7fd809499bb75030aadb0451",
-                url = "https://github.com/xmake-io/xmake-repo.git"
+                commit = "fd63520c7b8880a41eff7f69920fac70f300468d",
+                url = "https://gitlab.com/tboox/xmake-repo.git"
             },
-            version = "v3.1.1"
+            version = "v3.2.1"
         },
-        ["thrust#31fecfc4"] = {
+        ["toml++ 1f7884e59165e517462f922e7b6de131bd9844f3#31fecfc4"] = {
             repo = {
                 branch = "master",
-                commit = "0d384960d2e3a0b64aa8a25792f4332fa2742c5c",
-                url = "https://github.com/xmake-io/xmake-repo.git"
+                commit = "fd63520c7b8880a41eff7f69920fac70f300468d",
+                url = "https://gitlab.com/tboox/xmake-repo.git"
             },
-            version = "2.1.0"
-        },
-        ["toml++#31fecfc4"] = {
-            repo = {
-                branch = "master",
-                commit = "0d384960d2e3a0b64aa8a25792f4332fa2742c5c",
-                url = "https://github.com/xmake-io/xmake-repo.git"
-            },
-            version = "v3.4.0"
+            version = "1f7884e5"
         }
-    },
-    __meta__ = {
-        version = "1.0"
     }
 }
