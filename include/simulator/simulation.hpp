@@ -1,50 +1,27 @@
 #pragma once
 
+#include <simulator/agents/human.hpp>
+#include <simulator/agents/mosquito.hpp>
 #include <simulator/environment.hpp>
-#include <simulator/human/humans.hpp>
-#include <simulator/mosquito/mosquitos.hpp>
-#include <simulator/output.hpp>
 #include <simulator/parameters.hpp>
+
+#include <unordered_set>
 
 namespace simulator {
   class Simulation {
-    enum class Period {
-      Morning,
-      Afternoon,
-      Evening
-    };
-    const std::uint64_t id;
-
-    const Parameters& parameters;
     const Environment& environment;
-    const Output& output;
+    const Parameters& parameters;
 
-    Humans humans;
-    Mosquitos mosquitos;
+    std::unordered_set<Human> humans;
+    std::unordered_set<Mosquito> mosquitos;
 
-    auto humans_movement() -> void;
-    auto mosquitos_movement() -> void;
-
-    auto mosquitos_contact(Period period) -> void;
-    auto mosquitos_humans_contact(Period period) -> void;
-
-    auto mosquitos_phase_transition() -> void;
-    auto mosquitos_state_transition() -> void;
-    auto humans_state_transition() -> void;
-
-    auto mosquitos_age_control() -> void;
-    auto mosquitos_selection_control() -> void;
-    auto humans_selection_control() -> void;
-
-    auto mosquitos_generation() -> void;
-
-    auto humans_insertion() -> void;
-    auto mosquitos_insertion() -> void;
+    auto insertion() -> void;
+    auto movement() -> void;
+    auto contact() -> void;
+    auto transition() -> void;
 
   public:
-    Simulation(std::uint64_t id, const Parameters& parameters,
-               const Environment& environment, const Output& output,
-               Humans humans, Mosquitos mosquitos);
+    Simulation(const Environment& environment, const Parameters& parameters);
     auto run() -> void;
   };
 } // namespace simulator
