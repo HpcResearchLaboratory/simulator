@@ -1,67 +1,108 @@
-#include <simulator/human/humans.hpp>
-#include <simulator/mosquito/mosquitos.hpp>
+#include <iostream>
+#include <simulator/agents/agent.hpp>
+#include <simulator/environment.hpp>
 #include <simulator/simulation.hpp>
-#include <utility>
+#include <simulator/util/random.hpp>
 
 namespace simulator {
-  Simulation::Simulation(std::uint64_t id, const Parameters& parameters,
-                         const Environment& environment, const Output& output,
-                         Humans humans, Mosquitos mosquitos)
-    : id(id), parameters(parameters), environment(environment), output(output),
-      humans(std::move(humans)), mosquitos(std::move(mosquitos)) {}
+  Simulation::Simulation(const Environment& environment,
+                         const Parameters& parameters)
+    : environment(environment), parameters(parameters) {}
 
   auto Simulation::run() -> void {
-    const auto number_of_cycles =
-      *parameters.table["simulation"]["cycles_per_simulation"]
-         .as<std::int64_t>();
-    const auto number_of_subcycles =
-      *parameters.table["simulation"]["subcycles_per_period"]
-         .as<std::int64_t>();
+    const auto cycles = parameters.cycles;
 
-    for (auto cycle = 0; cycle < number_of_cycles; ++cycle) {
-      for (auto period = static_cast<std::int64_t>(Period::Evening);
-           period <= static_cast<std::int64_t>(Period::Afternoon); period++) {
-        humans_movement();
-        for (auto subcycle = 0; subcycle < number_of_subcycles; subcycle++) {
-          mosquitos_movement();
-
-          mosquitos_contact(static_cast<Period>(period));
-          mosquitos_humans_contact(static_cast<Period>(period));
-        }
-      }
-
-      mosquitos_phase_transition();
-      mosquitos_state_transition();
-      humans_state_transition();
-
-      mosquitos_age_control();
-      mosquitos_selection_control();
-      humans_selection_control();
-
-      mosquitos_generation();
-
-      humans_insertion();
-      mosquitos_insertion();
+    insertion();
+    for (std::size_t i = 0; i < cycles; i++) {
+      movement();
+      contact();
+      transition();
     }
   }
 
-  auto Simulation::humans_movement() -> void {};
-  auto Simulation::mosquitos_movement() -> void {};
+  auto Simulation::insertion() -> void {
+    humans.reserve(
+      parameters.human_initial_susceptible + parameters.human_initial_exposed +
+      parameters.human_initial_infected + parameters.human_initial_recovered);
+    mosquitos.reserve(parameters.mosquito_initial_susceptible +
+                      parameters.mosquito_initial_infected +
+                      parameters.mosquito_initial_recovered);
 
-  auto Simulation::mosquitos_contact(Period period) -> void {};
-  auto Simulation::mosquitos_humans_contact(Period period) -> void {};
+    const auto random_position_id =
+      [random_index =
+         util::make_random_generator_in_range(0UL, environment.size() - 1),
+       this]() {
+        return environment.get_nth_point_id(random_index());
+      };
 
-  auto Simulation::mosquitos_phase_transition() -> void {};
-  auto Simulation::mosquitos_state_transition() -> void {};
-  auto Simulation::humans_state_transition() -> void {};
+    auto human_id = 0UL;
 
-  auto Simulation::mosquitos_age_control() -> void {};
-  auto Simulation::mosquitos_selection_control() -> void {};
-  auto Simulation::humans_selection_control() -> void {};
+    for (std::size_t i = 0; i < parameters.human_initial_susceptible; i++) {
+      humans.insert(
+        Human { Human::State::Susceptible, human_id++, random_position_id() });
+    }
 
-  auto Simulation::mosquitos_generation() -> void {};
+    for (std::size_t i = 0; i < parameters.human_initial_exposed; i++) {
+      humans.insert(
+        Human { Human::State::Exposed, human_id++, random_position_id() });
+    }
 
-  auto Simulation::humans_insertion() -> void {};
-  auto Simulation::mosquitos_insertion() -> void {};
+    for (std::size_t i = 0; i < parameters.human_initial_infected; i++) {
+      humans.insert(
+        Human { Human::State::Infected, human_id++, random_position_id() });
+    }
 
+    for (std::size_t i = 0; i < parameters.human_initial_recovered; i++) {
+      humans.insert(
+        Human { Human::State::Recovered, human_id++, random_position_id() });
+    }
+
+    auto mosquito_id = 0UL;
+
+    for (std::size_t i = 0; i < parameters.mosquito_initial_susceptible; i++) {
+      mosquitos.insert(Mosquito { Mosquito::State::Susceptible, mosquito_id++,
+                                  random_position_id() });
+    }
+
+    for (std::size_t i = 0; i < parameters.mosquito_initial_infected; i++) {
+      mosquitos.insert(Mosquito { Mosquito::State::Infected, mosquito_id++,
+                                  random_position_id() });
+    }
+
+    for (std::size_t i = 0; i < parameters.mosquito_initial_recovered; i++) {
+      mosquitos.insert(Mosquito { Mosquito::State::Recovered, mosquito_id++,
+                                  random_position_id() });
+    }
+  }
+
+  auto Simulation::movement() -> void {
+    for (auto& human : humans) {
+      const auto position = human.position;
+      const auto edges = environment.get_edges(position);
+      const auto random_edge =
+        util::make_random_generator_in_range(0UL, edges.size() - 1)();
+      human.position =
+        *std::next(edges.begin(), static_cast<std::ptrdiff_t>(random_edge));
+    }
+
+    for (auto& mosquito : mosquitos) {
+      const auto position_id = mosquito.position;
+      const auto edges = environment.get_edges(position_id);
+      const auto random_edge =
+        util::make_random_generator_in_range(0UL, edges.size() - 1)();
+      mosquito.position =
+        *std::next(edges.begin(), static_cast<std::ptrdiff_t>(random_edge));
+    }
+  }
+
+  auto Simulation::contact() -> void {
+    const auto& points = environment.get_points();
+
+    for (const auto& [id, point] : points) {
+      std::cout << "ID: " << id << " - Point: (" << point.first << ", "
+                << point.second << ")\n";
+    }
+  }
+
+  auto Simulation::transition() -> void {}
 } // namespace simulator

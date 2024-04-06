@@ -1,24 +1,16 @@
-#include <simulator/environment.hpp>
 #include <simulator/monte_carlo.hpp>
-#include <simulator/parameters.hpp>
+#include <simulator/simulation.hpp>
 
 namespace simulator {
-
-  MonteCarlo::MonteCarlo(Parameters parameters, Environment environment,
-                         Output output)
-    : parameters(std::move(parameters)), environment(std::move(environment)),
-      output(std::move(output)) {}
+  MonteCarlo::MonteCarlo(const Environment& environment,
+                         const Parameters& parameters)
+    : environment(environment), parameters(parameters) {}
 
   auto MonteCarlo::run() const -> void {
-    const auto number_of_simulations =
-      *parameters.table["simulation"]["number_of_simulations"]
-         .as<std::int64_t>();
+    auto simulations_count = parameters.runs;
 
-    for (auto i = 0ull; i < number_of_simulations; ++i) {
-      const auto humans = Humans { parameters, environment };
-      const auto mosquitos = Mosquitos { parameters, environment };
-      auto simulation =
-        Simulation { i, parameters, environment, output, humans, mosquitos };
+    for (auto i = 0U; i < simulations_count; ++i) {
+      auto simulation = Simulation(environment, parameters);
       simulation.run();
     }
   }

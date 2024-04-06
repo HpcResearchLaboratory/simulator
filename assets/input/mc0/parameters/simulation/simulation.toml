@@ -1,5 +1,0 @@
-[simulation]
-number_of_simulations = 5
-cycles_per_simulation = 3
-subcycles_per_period = 4
-max_mosquitoes_proportion = 1000.0
