@@ -62,46 +62,46 @@ namespace simulator {
 
     return { runs,
              cycles,
-             util::make_random_generator_in_range(
+             util::make_cpu_rng(
                std::get<0>(human_infection_rate),
                std::get<1>(human_infection_rate))(),
-             util::make_random_generator_in_range(
+             util::make_cpu_rng(
                std::get<0>(human_initial_susceptible),
                std::get<1>(human_initial_susceptible))(),
-             util::make_random_generator_in_range(
+             util::make_cpu_rng(
                std::get<0>(human_initial_exposed),
                std::get<1>(human_initial_exposed))(),
-             util::make_random_generator_in_range(
+             util::make_cpu_rng(
                std::get<0>(human_initial_infected),
                std::get<1>(human_initial_infected))(),
-             util::make_random_generator_in_range(
+             util::make_cpu_rng(
                std::get<0>(human_initial_recovered),
                std::get<1>(human_initial_recovered))(),
-             util::make_random_generator_in_range(
+             util::make_cpu_rng(
                std::get<0>(human_transition_period_exposed),
                std::get<1>(human_transition_period_exposed))(),
-             util::make_random_generator_in_range(
+             util::make_cpu_rng(
                std::get<0>(human_transition_period_infected),
                std::get<1>(human_transition_period_infected))(),
-             util::make_random_generator_in_range(
+             util::make_cpu_rng(
                std::get<0>(human_transition_period_recovered),
                std::get<1>(human_transition_period_recovered))(),
-             util::make_random_generator_in_range(
+             util::make_cpu_rng(
                std::get<0>(mosquito_infection_rate),
                std::get<1>(mosquito_infection_rate))(),
-             util::make_random_generator_in_range(
+             util::make_cpu_rng(
                std::get<0>(mosquito_initial_susceptible),
                std::get<1>(mosquito_initial_susceptible))(),
-             util::make_random_generator_in_range(
+             util::make_cpu_rng(
                std::get<0>(mosquito_initial_infected),
                std::get<1>(mosquito_initial_infected))(),
-             util::make_random_generator_in_range(
+             util::make_cpu_rng(
                std::get<0>(mosquito_initial_recovered),
                std::get<1>(mosquito_initial_recovered))(),
-             util::make_random_generator_in_range(
+             util::make_cpu_rng(
                std::get<0>(mosquito_transition_period_infected),
                std::get<1>(mosquito_transition_period_infected))(),
-             util::make_random_generator_in_range(
+             util::make_cpu_rng(
                std::get<0>(mosquito_transition_period_recovered),
                std::get<1>(mosquito_transition_period_recovered))() };
   }
