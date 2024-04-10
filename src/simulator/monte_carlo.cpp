@@ -7,11 +7,11 @@ namespace simulator {
     : environment(environment), parameters(parameters) {}
 
   auto MonteCarlo::run() const -> void {
-    auto simulations_count = parameters.runs;
-
-    for (auto i = 0U; i < simulations_count; ++i) {
-      auto simulation = Simulation(environment, parameters);
-      simulation.run();
-    }
+    /*auto simulations_count = parameters.runs;*/
+    /**/
+    /*for (auto i = 0U; i < simulations_count; ++i) {*/
+    /*  auto simulation = Simulation(environment, parameters);*/
+    /*  simulation.run();*/
+    /*}*/
   }
 } // namespace simulator

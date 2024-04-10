@@ -1,27 +1,35 @@
 #pragma once
 
-#include <simulator/agents/human.hpp>
-#include <simulator/agents/mosquito.hpp>
+#include <simulator/agent.hpp>
+#include <simulator/agent/human.hpp>
+#include <simulator/agent/mosquito.hpp>
 #include <simulator/environment.hpp>
 #include <simulator/parameters.hpp>
 
-#include <unordered_set>
+#include <memory>
+#include <vector>
 
 namespace simulator {
   class Simulation {
-    const Environment& environment;
-    const Parameters& parameters;
+    std::unique_ptr<const Environment> environment;
+    std::unique_ptr<const Parameters> parameters;
 
-    std::unordered_set<Human> humans;
-    std::unordered_set<Mosquito> mosquitos;
+    std::unique_ptr<std::vector<agent::Human>> humans;
+    std::unique_ptr<std::vector<agent::Mosquito>> mosquitos;
 
-    auto insertion() -> void;
-    auto movement() -> void;
-    auto contact() -> void;
-    auto transition() -> void;
+    std::unique_ptr<std::vector<
+      std::pair<std::vector<std::size_t>, std::vector<std::size_t>>>>
+      agents_in_position;
+
+    auto insertion() noexcept -> void;
+    auto movement() noexcept -> void;
+    auto contact() noexcept -> void;
+    auto transition() noexcept -> void;
+    auto output() noexcept -> void;
 
   public:
-    Simulation(const Environment& environment, const Parameters& parameters);
-    auto run() -> void;
+    Simulation(std::unique_ptr<const Environment> environment,
+               std::unique_ptr<const Parameters> parameters) noexcept;
+    auto run() noexcept -> void;
   };
 } // namespace simulator

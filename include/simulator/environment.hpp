@@ -1,12 +1,12 @@
 #pragma once
 
-#include <set>
+#include <cstddef>
 #include <string_view>
-#include <unordered_map>
+#include <vector>
 
 namespace simulator {
 
-  class Environment {
+  struct Environment {
     /**
      * Distance threshold for two points to be considered connected.
      */
@@ -14,21 +14,11 @@ namespace simulator {
 
     using Point = std::pair<double, double>;
 
-    std::unordered_map<std::size_t, Point> points;
-    std::unordered_map<std::size_t, std::set<std::size_t>> edges;
+    std::vector<Point> points;
+    std::vector<std::vector<std::size_t>> edges;
+    std::size_t size = 0UL;
 
-    Environment(std::unordered_map<std::size_t, Point> points,
-                std::unordered_map<std::size_t, std::set<std::size_t>> edges)
-      : points { std::move(points) }, edges { std::move(edges) } {}
-
-  public:
-    auto size() const -> std::size_t;
-    auto get_nth_point_id(std::size_t) const -> std::size_t;
-    auto get_points() const -> const std::unordered_map<std::size_t, Point>&;
-    auto get_edges(std::size_t) const -> const std::set<std::size_t>&;
-    auto print() const -> void;
-
-    static auto from_geojson(const std::string_view) -> Environment;
+    static auto from_geojson(const std::string_view) noexcept -> Environment;
   };
 
 } // namespace simulator
