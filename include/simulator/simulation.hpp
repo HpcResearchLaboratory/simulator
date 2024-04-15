@@ -9,6 +9,11 @@
 #include <memory>
 #include <vector>
 
+#include <exec/on.hpp>
+#include <exec/static_thread_pool.hpp>
+#include <nvexec/multi_gpu_context.cuh>
+#include <stdexec/execution.hpp>
+
 namespace simulator {
   class Simulation {
     std::unique_ptr<const Environment> environment;
@@ -18,10 +23,16 @@ namespace simulator {
     std::unique_ptr<std::vector<agent::Mosquito>> mosquitos;
 
     std::unique_ptr<std::vector<
-      std::pair<std::vector<std::size_t>, std::vector<std::size_t>>>>
+      std::pair<std::vector<std::int64_t>, std::vector<std::int64_t>>>>
       agents_in_position;
 
-    auto insertion() noexcept -> void;
+    nvexec::multi_gpu_stream_context gpu_ctx;
+    exec::static_thread_pool cpu_ctx;
+
+    nvexec::multi_gpu_stream_scheduler gpu;
+    exec::static_thread_pool::scheduler cpu;
+
+    auto insertion() noexcept;
     auto movement() noexcept -> void;
     auto contact() noexcept -> void;
     auto transition() noexcept -> void;

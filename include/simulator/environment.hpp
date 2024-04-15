@@ -7,11 +7,6 @@
 namespace simulator {
 
   struct Environment {
-    /**
-     * Distance threshold for two points to be considered connected.
-     */
-    static constexpr auto distance_threshold = 1e-7;
-
     using Point = std::pair<double, double>;
 
     std::vector<Point> points;

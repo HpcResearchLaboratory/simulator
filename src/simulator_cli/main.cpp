@@ -1,14 +1,13 @@
-#include "simulator/simulation.hpp"
-#include <iostream>
 #include <simulator/environment.hpp>
 #include <simulator/monte_carlo.hpp>
 #include <simulator/parameters.hpp>
+#include <simulator/simulation.hpp>
+#include <simulator/util/random.hpp>
 
 #include <filesystem>
 #include <fstream>
+#include <memory>
 #include <string>
-
-using std::move;
 
 namespace fs = std::filesystem;
 
@@ -26,12 +25,14 @@ auto main() -> int {
     std::string { std::istreambuf_iterator<char> { parameters_input_file },
                   std::istreambuf_iterator<char> {} };
 
-  const auto environment =
-    simulator::Environment::from_geojson(environment_data);
-  const auto parameters = simulator::Parameters::from_json(parameters_data);
+  auto environment = std::make_unique<const simulator::Environment>(
+    simulator::Environment::from_geojson(environment_data));
+  auto parameters = std::make_unique<const simulator::Parameters>(
+    simulator::Parameters::from_json(parameters_data));
 
-  auto simulation = simulator::Simulation { environment, parameters };
-  simulation.run();
+  /*auto simulation =*/
+  /*  simulator::Simulation { std::move(environment), std::move(parameters) };*/
+  /*simulation.run();*/
 
   // const auto simulations =
   //   std::views::all(fs::directory_iterator(input_path / "simulations"));
@@ -51,4 +52,5 @@ auto main() -> int {
   // for (auto& fut : futures) {
   //   fut.wait();
   // }
+  return 0;
 }
