@@ -29,18 +29,16 @@ namespace simulator::util {
 
   template <typename T>
     requires std::is_arithmetic_v<T>
-  auto make_gpu_rng(T min, T max, std::size_t seed) noexcept
-    -> std::function<T(std::size_t)> {
-
+  auto make_gpu_rng(T min, T max, std::size_t seed) noexcept {
     if constexpr (std::is_integral_v<T>) {
-      return [=](std::size_t idx) mutable {
+      return [min, max, seed](std::size_t idx) mutable noexcept {
         thrust::default_random_engine rng(seed);
         thrust::uniform_int_distribution<T> dist(min, max);
         rng.discard(idx);
         return dist(rng);
       };
     } else {
-      return [=](std::size_t idx) mutable {
+      return [min, max, seed](std::size_t idx) mutable noexcept {
         thrust::default_random_engine rng(seed);
         thrust::uniform_real_distribution<T> dist(min, max);
         rng.discard(idx);

@@ -14,8 +14,8 @@ namespace simulator {
 
   using json = nlohmann::json;
 
-  // TODO: Support "Polygon" type
-  auto Environment::from_geojson(const std::string_view data) -> Environment {
+  auto Environment::from_geojson(const std::string_view data) noexcept
+    -> Environment {
     std::vector<Point> points;
     std::vector<std::vector<std::size_t>> edges;
 
@@ -25,49 +25,17 @@ namespace simulator {
       const auto& type = feature["geometry"]["type"].get<std::string>();
       if (type == "Point") {
         const auto& point = feature["geometry"]["coordinates"].get<Point>();
-        /*const auto& id = feature["id"].get<std::size_t>();*/
+        const auto& id = feature["id"].get<std::size_t>();
 
         points.emplace_back(point);
         edges.emplace_back();
       } else if (type == "LineString") {
-        const auto coordinates =
-          feature["geometry"]["coordinates"].get<std::vector<Point>>();
+        const auto src = feature["src"].get<std::size_t>();
+        const auto tgt = feature["tgt"].get<std::size_t>();
 
-        for (std::size_t i = 0; i < coordinates.size() - 1; ++i) {
-          const auto& start = coordinates[i];
-          const auto& end = coordinates[i + 1];
-
-          const auto start_id = [&] {
-            for (auto id = 0UL; id < points.size(); id++) {
-              const auto& point = points[id];
-              const auto distance = std::pow(point.first - start.first, 2) +
-                std::pow(point.second - start.second, 2);
-
-              if (distance < distance_threshold) {
-                return std::optional { id };
-              }
-            }
-            return std::optional<std::size_t> {};
-          }();
-
-          const auto end_id = [&] {
-            for (auto id = 0UL; id < points.size(); id++) {
-              const auto& point = points[id];
-              const auto distance = std::pow(point.first - end.first, 2) +
-                std::pow(point.second - end.second, 2);
-
-              if (distance < distance_threshold) {
-                return std::optional { id };
-              }
-            }
-            return std::optional<std::size_t> {};
-          }();
-
-          if (start_id && end_id && start_id != end_id) {
-            edges[start_id.value()].push_back(end_id.value());
-            edges[end_id.value()].push_back(start_id.value());
-          }
-        }
+        // NOTE: Points ids begin at 1, but point indices begin at 0
+        edges[src - 1].push_back(tgt - 1);
+        edges[tgt - 1].push_back(src - 1);
       }
     }
 
