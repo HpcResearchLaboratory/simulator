@@ -1,88 +1,66 @@
-#ifndef __SIMULACAO__
-#define __SIMULACAO__
+#pragma once
 
-class Seeds;
-class Parametros;
-class Ambiente;
-class Saidas;
-class Humanos;
-class Mosquitos;
+#include <simulator/agent/human.hpp>
+#include <simulator/agent/mosquito.hpp>
+#include <simulator/environment.hpp>
+#include <simulator/parameters.hpp>
+#include <simulator/state.hpp>
 
-#include <cmath>
+#include <cstddef>
+#include <memory>
+#include <vector>
 
-#include <thrust/copy.h>
-#include <thrust/count.h>
-#include <thrust/for_each.h>
-#include <thrust/functional.h>
-#include <thrust/partition.h>
+#include <exec/on.hpp>
+#include <exec/static_thread_pool.hpp>
+#include <nvexec/multi_gpu_context.cuh>
+#include <stdexec/execution.hpp>
 
-using std::abs;
-using std::cerr;
-using std::cout;
-using std::endl;
-using std::ofstream;
-using std::pow;
-using std::string;
-using std::to_string;
+namespace simulator {
+  class Simulation {
+    std::size_t iteration = 0;
 
-using thrust::copy;
-using thrust::count_if;
-using thrust::for_each_n;
-using thrust::partition;
-using thrust::plus;
-using thrust::raw_pointer_cast;
+    std::shared_ptr<const Environment> environment;
+    std::unique_ptr<const Parameters> parameters;
 
-/*
-  Classe responsável por armazenar todos os dados associados à execução de uma
-  simulação individual.
-*/
-class Simulacao {
+    nvexec::multi_gpu_stream_scheduler gpu;
+    exec::static_thread_pool::scheduler cpu;
 
-  int idSim, ciclo, periodo, subciclo;
-  string saidaSim;
-  Seeds *seeds;
-  Parametros *parametros;
-  Ambiente *ambiente;
-  Saidas *saidas;
-  Humanos *humanos;
-  Mosquitos *mosquitos;
-  // double ref = 0;
-  int idLira;
-  string saidaM, saidaH, arquivoSaidaOviposicao;
-  int saidaSubciclo;
+    std::unique_ptr<std::vector<agent::Human>> humans;
+    std::unique_ptr<std::vector<agent::Mosquito>> mosquitos;
+    std::unique_ptr<std::vector<
+      std::pair<std::vector<std::int64_t>, std::vector<std::int64_t>>>>
+      agents_in_position;
 
-public:
-  Simulacao(int idSim, string saidaSim, Saidas *saidas, Parametros *parametros,
-            Ambiente *ambiente, int saidaSubciclo);
+    auto insertion() noexcept -> void;
+    auto movement() noexcept -> void;
+    auto contact() noexcept -> void;
+    auto transition() noexcept -> void;
+    [[nodiscard]] auto output() noexcept -> State;
 
-  ~Simulacao();
+  public:
+    Simulation(std::shared_ptr<const Environment> environment,
+               std::unique_ptr<const Parameters> parameters,
+               nvexec::multi_gpu_stream_scheduler&& gpu_ctx,
+               exec::static_thread_pool::scheduler&& cpu_ctx) noexcept;
+    /**
+     * @brief Run the simulation
+     *
+     * This method runs all the simulation steps until the end of the simulation
+     */
+    auto run() noexcept -> void;
 
-private:
-  void iniciar();
-  // void calcularRt();
-  void calcularIdLira();
-  void movimentacaoHumanos();
-  void movimentacaoMosquitos();
-  void contatoEntreMosquitos(int periodo);
-  void contatoEntreMosquitosEHumanos(int periodo);
-  void transicaoFasesMosquitos();
-  void transicaoEstadosMosquitos();
-  void transicaoEstadosHumanos();
-  void vacinacao();
-  void controleNaturalMosquitosPorIdade();
-  void controleNaturalMosquitosPorSelecao();
-  void controleNaturalHumanos();
-  void controlesMosquitos();
-  void controleBiologico();
-  void tratamentoAmbiental();
-  void geracao();
-  void insercaoMosquitos();
-  void insercaoHumanos();
-  void computarSaidas();
-  void exibirConsumoMemoria();
-  void saidaBitstringMosquitos();
-  void saidaBitstringHumanos();
-  void saidaOviposicao();
-};
+    /**
+     * @brief Prepare the simulation
+     *
+     * This method prepares the simulation for the first iteration
+     */
+    auto prepare() noexcept -> void;
 
-#endif
+    /**
+     * @brief Iterate the simulation
+     *
+     * This method runs one iteration of the simulation and returns the state
+     */
+    [[nodiscard]] auto iterate() noexcept -> std::optional<State>;
+  };
+} // namespace simulator

@@ -1,41 +1,15 @@
-#ifndef __MONTE_CARLO__
-#define __MONTE_CARLO__
+#pragma once
 
-#include <chrono>
-#include <ctime>
-#include <iomanip>
-#include <iostream>
-#include <string>
+#include <simulator/environment.hpp>
+#include <simulator/parameters.hpp>
 
-class Parametros;
-class Ambiente;
-class Saidas;
+namespace simulator {
+  class MonteCarlo {
+    const Environment& environment;
+    const Parameters& parameters;
 
-using std::cout;
-using std::endl;
-using std::localtime;
-using std::put_time;
-using std::string;
-using std::time_t;
-using std::to_string;
-
-using namespace std::chrono;
-
-class MonteCarlo {
-
-public:
-  string entradaMC, saidaMC;
-  int saidaSubciclo;
-  Parametros *parametros;
-  Ambiente *ambiente;
-  Saidas *saidas;
-
-  MonteCarlo(string entradaMC, string saidaMC, int saidaSubciclo);
-  ~MonteCarlo();
-
-private:
-  void iniciar();
-  void exibirData();
-};
-
-#endif
+  public:
+    MonteCarlo(const Environment& environment, const Parameters& parameters);
+    auto run() const -> void;
+  };
+} // namespace simulator
