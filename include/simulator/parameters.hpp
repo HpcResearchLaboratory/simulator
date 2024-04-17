@@ -1,43 +1,29 @@
-#ifndef __PARAMETROS__
-#define __PARAMETROS__
+#pragma once
 
-#include <fstream>
-#include <iostream>
-#include <limits>
-#include <string>
+#include <cstddef>
+#include <string_view>
 
-#include <thrust/device_vector.h>
+namespace simulator {
 
-using std::cerr;
-using std::endl;
-using std::fstream;
-using std::ifstream;
-using std::numeric_limits;
-using std::streamsize;
-using std::string;
+  struct Parameters {
+    std::size_t runs;
+    std::size_t cycles;
+    double human_infection_rate;
+    std::size_t human_initial_susceptible;
+    std::size_t human_initial_exposed;
+    std::size_t human_initial_infected;
+    std::size_t human_initial_recovered;
+    std::size_t human_transition_period_exposed;
+    std::size_t human_transition_period_infected;
+    std::size_t human_transition_period_recovered;
+    double mosquito_infection_rate;
+    std::size_t mosquito_initial_susceptible;
+    std::size_t mosquito_initial_infected;
+    std::size_t mosquito_initial_recovered;
+    std::size_t mosquito_transition_period_infected;
+    std::size_t mosquito_transition_period_recovered;
 
-template <class T> using DVector = thrust::device_vector<T>;
+    static auto from_json(const std::string_view) -> Parameters;
+  };
 
-using thrust::raw_pointer_cast;
-
-class Parametros {
-
-public:
-  string entradaMC;
-  int nParametros, nSims, nCiclos, nSubCiclos;
-  double *parametros;
-  DVector<double> *parametrosDev;
-  double *PparametrosDev;
-  streamsize sMax = numeric_limits<streamsize>::max();
-
-  Parametros(string entradaMC);
-  int getMemoriaGPU();
-  ~Parametros();
-
-private:
-  void toGPU();
-  void lerArquivo(string pasta, string nomeArquivo, int &i, int nPar);
-  void lerParametros();
-};
-
-#endif
+} // namespace simulator
