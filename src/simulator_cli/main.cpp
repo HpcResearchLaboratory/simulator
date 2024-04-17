@@ -1,6 +1,7 @@
 #include <simulator/environment.hpp>
 #include <simulator/monte_carlo.hpp>
 #include <simulator/parameters.hpp>
+
 #include <simulator/simulation.hpp>
 #include <simulator/util/random.hpp>
 
@@ -25,14 +26,18 @@ auto main() -> int {
     std::string { std::istreambuf_iterator<char> { parameters_input_file },
                   std::istreambuf_iterator<char> {} };
 
-  auto environment = std::make_unique<const simulator::Environment>(
+  auto environment = std::make_shared<const simulator::Environment>(
     simulator::Environment::from_geojson(environment_data));
   auto parameters = std::make_unique<const simulator::Parameters>(
     simulator::Parameters::from_json(parameters_data));
 
-  /*auto simulation =*/
-  /*  simulator::Simulation { std::move(environment), std::move(parameters) };*/
-  /*simulation.run();*/
+  nvexec::multi_gpu_stream_context gpu_ctx;
+  exec::static_thread_pool cpu_ctx { std::thread::hardware_concurrency() };
+  auto simulation =
+    simulator::Simulation { environment, std::move(parameters),
+                            gpu_ctx.get_scheduler(), cpu_ctx.get_scheduler() };
+
+  simulation.run();
 
   // const auto simulations =
   //   std::views::all(fs::directory_iterator(input_path / "simulations"));

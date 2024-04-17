@@ -1,3 +1,5 @@
+# https://clangd.llvm.org/config
+
 # Apply a config conditionally to all C files
 If:
   PathMatch: .*\.(c|h)$
@@ -17,20 +19,27 @@ CompileFlags:
   Add:
     # Allow variadic CUDA functions
     - "-Xclang=-fcuda-allow-variadic-functions"
-    - "-stdpar=gpu"
+    - "-ferror-limit=0"
+    - "-fmacro-backtrace-limit=0"
+    - "-ftemplate-backtrace-limit=0"
 
 ---
 
 # Use clang++ in CUDA mode to provide intellisense for files with `nvexec` in their path
 If:
-  PathMatch: .*\.cuh?
+  PathMatch: (include|examples|test)/nvexec.*
 CompileFlags:
-  Compiler: clang++
+  Compiler: g++
   Add:
     - "-x"
     - "cuda"
-    - "-std=gnu++20"
+    - "-D_NVHPC_CUDA"
     - "-Wno-unknown-cuda-version"
+    - "-ferror-limit=0"
+    - "-fmacro-backtrace-limit=0"
+    - "-ftemplate-backtrace-limit=0"
+  Remove:
+    - "-stdpar=*"
 
 ---
 
@@ -53,8 +62,6 @@ CompileFlags:
     - "--generate-code*"
     # strip gcc's -fcoroutines
     - -fcoroutines
-    # strip nvc++ flags unknown to clang
-    - "-ftemplate-backtrace-limit"
     # strip CUDA flags unknown to clang
     - "-ccbin*"
     - "--compiler-options*"
