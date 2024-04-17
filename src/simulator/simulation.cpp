@@ -1,24 +1,28 @@
 #include <simulator/agent/human.hpp>
 #include <simulator/agent/mosquito.hpp>
 #include <simulator/environment.hpp>
-#include <simulator/result.hpp>
 #include <simulator/simulation.hpp>
+#include <simulator/state.hpp>
 #include <simulator/util/functional.hpp>
 #include <simulator/util/random.hpp>
 
 #include <algorithm>
 #include <cstddef>
-#include <cstdint>
 #include <cstdio>
 #include <execution>
 #include <memory>
-#include <thread>
+#include <tuple>
 #include <utility>
 
+#include <stdexec/execution.hpp>
+
 namespace simulator {
-  Simulation::Simulation(std::unique_ptr<const Environment> environment,
-                         std::unique_ptr<const Parameters> parameters) noexcept
+  Simulation::Simulation(std::shared_ptr<const Environment> environment,
+                         std::unique_ptr<const Parameters> parameters,
+                         nvexec::multi_gpu_stream_scheduler&& gpu,
+                         exec::static_thread_pool::scheduler&& cpu) noexcept
     : environment(std::move(environment)), parameters(std::move(parameters)),
+      gpu(std::move(gpu)), cpu(std::move(cpu)),
       humans(std::make_unique<std::vector<agent::Human>>(
         this->parameters->human_initial_susceptible +
         this->parameters->human_initial_exposed +
@@ -36,40 +40,51 @@ namespace simulator {
             this->environment->size,
             std::make_pair(
               std::vector<std::int64_t>(this->humans->size(), -1),
-              std::vector<std::int64_t>(this->mosquitos->size(), -1))))),
-      gpu_ctx {}, cpu_ctx { std::thread::hardware_concurrency() },
-      gpu(gpu_ctx.get_scheduler()), cpu(cpu_ctx.get_scheduler()) {}
+              std::vector<std::int64_t>(this->mosquitos->size(), -1))))) {}
 
   auto Simulation::run() noexcept -> void {
     const auto cycles = parameters->cycles;
 
+    auto start = std::chrono::high_resolution_clock::now();
     insertion();
+    std::cout << "Insertion: "
+              << std::chrono::duration_cast<std::chrono::milliseconds>(
+                   std::chrono::high_resolution_clock::now() - start)
+                   .count()
+              << "ms" << std::endl;
     for (std::size_t i = 0; i < cycles; i++) {
       auto start = std::chrono::high_resolution_clock::now();
-      std::cout << "Cycle: " << i << std::endl;
       movement();
       std::cout << "Movement: "
                 << std::chrono::duration_cast<std::chrono::milliseconds>(
                      std::chrono::high_resolution_clock::now() - start)
                      .count()
                 << "ms" << std::endl;
+      start = std::chrono::high_resolution_clock::now();
       contact();
       std::cout << "Contact: "
                 << std::chrono::duration_cast<std::chrono::milliseconds>(
                      std::chrono::high_resolution_clock::now() - start)
                      .count()
                 << "ms" << std::endl;
+      start = std::chrono::high_resolution_clock::now();
       transition();
       std::cout << "Transition: "
                 << std::chrono::duration_cast<std::chrono::milliseconds>(
                      std::chrono::high_resolution_clock::now() - start)
                      .count()
-                << "ms" << std::endl
-                << std::endl;
+                << "ms" << std::endl;
+      start = std::chrono::high_resolution_clock::now();
+      output();
+      std::cout << "Output: "
+                << std::chrono::duration_cast<std::chrono::milliseconds>(
+                     std::chrono::high_resolution_clock::now() - start)
+                     .count()
+                << "ms" << std::endl;
     }
   }
 
-  auto Simulation::insertion() noexcept  {
+  auto Simulation::insertion() noexcept -> void {
     auto random_human_position = util::make_gpu_rng(
       0UL, environment->size - 1,
       std::chrono::high_resolution_clock::now().time_since_epoch().count());
@@ -154,7 +169,7 @@ namespace simulator {
           idx;
       };
 
-    return stdexec::when_all(
+    const auto work = stdexec::when_all(
       stdexec::just() |
         exec::on(gpu,
                  stdexec::bulk(parameters->human_initial_susceptible,
@@ -183,7 +198,9 @@ namespace simulator {
         exec::on(gpu,
                  stdexec::bulk(parameters->mosquito_initial_recovered,
                                insert_recovered_mosquito)));
-  };
+
+    stdexec::sync_wait(std::move(work));
+  }
 
   auto Simulation::movement() noexcept -> void {
     auto random_human_position = util::make_gpu_rng(
@@ -393,33 +410,47 @@ namespace simulator {
     stdexec::sync_wait(std::move(work));
   }
 
-  auto Simulation::output() noexcept -> void {
-    auto result = std::transform_reduce(
+  auto Simulation::output() noexcept -> State {
+    auto humans_in_states = std::transform_reduce(
       std::execution::par_unseq, std::begin(*humans), std::end(*humans),
-      std::begin(*mosquitos), Result { { 0, 0, 0, 0 }, { 0, 0, 0 } },
-      [](Result result1, Result result2) {
-        const auto& [h1, m1] = result1;
-        const auto& [h2, m2] = result2;
-        const auto& [s1, e1, i1, r1] = h1;
-        const auto& [s2, e2, i2, r2] = h2;
-        const auto& [s3, i3, r3] = m1;
-        const auto& [s4, i4, r4] = m2;
-
-        return Result { { s1 + s2, e1 + e2, i1 + i2, r1 + r2 },
-                        { s3 + s4, i3 + i4, r3 + r4 } };
+      std::make_tuple<std::size_t, std::size_t, std::size_t, std::size_t>(
+        0L, 0L, 0L, 0L),
+      [](const auto& seir1, const auto& seir2) {
+        return std::make_tuple<std::size_t, std::size_t, std::size_t,
+                               std::size_t>(
+          std::get<0>(seir1) + std::get<0>(seir2),
+          std::get<1>(seir1) + std::get<1>(seir2),
+          std::get<2>(seir1) + std::get<2>(seir2),
+          std::get<3>(seir1) + std::get<3>(seir2));
       },
-      [](const auto& human, const auto& mosquito) {
-        return Result { { human.state == agent::Human::State::Susceptible,
-                          human.state == agent::Human::State::Exposed,
-                          human.state == agent::Human::State::Infected,
-                          human.state == agent::Human::State::Recovered },
-                        { mosquito.state == agent::Mosquito::State::Susceptible,
-                          mosquito.state == agent::Mosquito::State::Infected,
-                          mosquito.state ==
-                            agent::Mosquito::State::Recovered } };
+      [](const auto& human) {
+        return std::make_tuple<std::size_t, std::size_t, std::size_t,
+                               std::size_t>(
+          human.state == agent::Human::State::Susceptible ? 1 : 0,
+          human.state == agent::Human::State::Exposed ? 1 : 0,
+          human.state == agent::Human::State::Infected ? 1 : 0,
+          human.state == agent::Human::State::Recovered ? 1 : 0);
       });
-    auto [humans, mosquitos] = result;
-    auto [s1, e1, i1, r1] = humans;
-    auto [s2, i2, r2] = mosquitos;
+
+    auto mosquitos_in_states = std::transform_reduce(
+      std::execution::par_unseq, std::begin(*mosquitos), std::end(*mosquitos),
+      std::make_tuple<std::size_t, std::size_t, std::size_t>(0L, 0L, 0L),
+      [](const auto& sir1, const auto& sir2) {
+        return std::make_tuple<std::size_t, std::size_t, std::size_t>(
+          std::get<0>(sir1) + std::get<0>(sir2),
+          std::get<1>(sir1) + std::get<1>(sir2),
+          std::get<2>(sir1) + std::get<2>(sir2));
+      },
+      [](const auto& mosquito) {
+        return std::make_tuple<std::size_t, std::size_t, std::size_t>(
+          mosquito.state == agent::Mosquito::State::Susceptible ? 1 : 0,
+          mosquito.state == agent::Mosquito::State::Infected ? 1 : 0,
+          mosquito.state == agent::Mosquito::State::Recovered ? 1 : 0);
+      });
+
+    return State { { ++iteration, parameters->cycles },
+                   humans_in_states,
+                   mosquitos_in_states };
   }
+
 } // namespace simulator
