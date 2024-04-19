@@ -48,19 +48,15 @@ add_requires("cmake::NVHPC",
     }
   }
 )
-add_requires("cuda")
-
-
 add_packages("cmake::NVHPC")
-add_packages("cuda")
 
 
 -- [[ Project dependencies and repositories ]]
 local simulator_deps = { "nlohmann_json", "stdexec" }
-local simulator_cli_deps = { "stdexec" }
+local simula_cli_deps = { "stdexec", "argparse", "indicators" };
 
 add_requires(table.unpack(simulator_deps))
-add_requires(table.unpack(simulator_cli_deps))
+add_requires(table.unpack(simula_cli_deps))
 -- add_requires(table.unpack(test_deps))
 -- add_requires(table.unpack(bench_deps))
 
@@ -70,12 +66,16 @@ target("simulator", function()
   set_kind("static")
   add_files("src/simulator/*.cpp", "src/simulator/**/*.cpp")
   add_packages(table.unpack(simulator_deps))
+  set_targetdir("./simulator")
+  set_installdir("./simulator")
 end)
 
 
-target("simulator_cli", function()
+target("simula_cli", function()
   set_kind("binary")
-  add_files("src/simulator_cli/*.cpp")
-  add_packages(table.unpack(simulator_cli_deps))
+  add_files("src/simula_cli/*.cpp")
+  add_packages(table.unpack(simula_cli_deps))
   add_deps("simulator")
+  set_targetdir("./simulator")
+  set_installdir("./simulator")
 end)
