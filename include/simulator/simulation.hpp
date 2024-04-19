@@ -1,8 +1,8 @@
 #pragma once
 
-#include <simulator/agent/human.hpp>
-#include <simulator/agent/mosquito.hpp>
 #include <simulator/environment.hpp>
+#include <simulator/human.hpp>
+#include <simulator/mosquito.hpp>
 #include <simulator/parameters.hpp>
 #include <simulator/state.hpp>
 
@@ -20,28 +20,28 @@ namespace simulator {
     std::size_t iteration = 0;
 
     std::shared_ptr<const Environment> environment;
-    std::unique_ptr<const Parameters> parameters;
+    std::shared_ptr<const Parameters> parameters;
 
-    nvexec::multi_gpu_stream_scheduler gpu;
-    exec::static_thread_pool::scheduler cpu;
+    nvexec::multi_gpu_stream_context gpu;
+    exec::static_thread_pool cpu;
 
-    std::unique_ptr<std::vector<agent::Human>> humans;
-    std::unique_ptr<std::vector<agent::Mosquito>> mosquitos;
+    std::unique_ptr<std::vector<Human>> humans;
+    std::unique_ptr<std::vector<Mosquito>> mosquitos;
     std::unique_ptr<std::vector<
       std::pair<std::vector<std::int64_t>, std::vector<std::int64_t>>>>
       agents_in_position;
+
+    std::unique_ptr<std::vector<State>> states;
 
     auto insertion() noexcept -> void;
     auto movement() noexcept -> void;
     auto contact() noexcept -> void;
     auto transition() noexcept -> void;
-    [[nodiscard]] auto output() noexcept -> State;
+    [[nodiscard]] auto output() noexcept -> const State&;
 
   public:
     Simulation(std::shared_ptr<const Environment> environment,
-               std::unique_ptr<const Parameters> parameters,
-               nvexec::multi_gpu_stream_scheduler&& gpu_ctx,
-               exec::static_thread_pool::scheduler&& cpu_ctx) noexcept;
+               std::shared_ptr<const Parameters> parameters) noexcept;
     /**
      * @brief Run the simulation
      *
@@ -61,6 +61,15 @@ namespace simulator {
      *
      * This method runs one iteration of the simulation and returns the state
      */
-    [[nodiscard]] auto iterate() noexcept -> std::optional<State>;
+    [[nodiscard]] auto iterate() noexcept -> std::optional<const State* const>;
+
+    /**
+     * @brief Get the states of the simulation, a.k.a. the results
+     *
+     * This method returns the states of the simulation
+     *
+     * @return The states of the simulation
+     */
+    [[nodiscard]] auto get_states() noexcept -> const std::vector<State>&;
   };
 } // namespace simulator
