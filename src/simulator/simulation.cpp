@@ -1,6 +1,6 @@
-#include <simulator/agent/human.hpp>
-#include <simulator/agent/mosquito.hpp>
 #include <simulator/environment.hpp>
+#include <simulator/human.hpp>
+#include <simulator/mosquito.hpp>
 #include <simulator/simulation.hpp>
 #include <simulator/state.hpp>
 #include <simulator/util/functional.hpp>
@@ -18,17 +18,14 @@
 
 namespace simulator {
   Simulation::Simulation(std::shared_ptr<const Environment> environment,
-                         std::unique_ptr<const Parameters> parameters,
-                         nvexec::multi_gpu_stream_scheduler&& gpu,
-                         exec::static_thread_pool::scheduler&& cpu) noexcept
+                         std::shared_ptr<const Parameters> parameters) noexcept
     : environment(std::move(environment)), parameters(std::move(parameters)),
-      gpu(std::move(gpu)), cpu(std::move(cpu)),
-      humans(std::make_unique<std::vector<agent::Human>>(
-        this->parameters->human_initial_susceptible +
-        this->parameters->human_initial_exposed +
-        this->parameters->human_initial_infected +
-        this->parameters->human_initial_recovered)),
-      mosquitos(std::make_unique<std::vector<agent::Mosquito>>(
+      cpu(1), gpu {}, humans(std::make_unique<std::vector<Human>>(
+                        this->parameters->human_initial_susceptible +
+                        this->parameters->human_initial_exposed +
+                        this->parameters->human_initial_infected +
+                        this->parameters->human_initial_recovered)),
+      mosquitos(std::make_unique<std::vector<Mosquito>>(
         this->parameters->mosquito_initial_susceptible +
         this->parameters->mosquito_initial_infected +
         this->parameters->mosquito_initial_recovered)),
@@ -40,47 +37,36 @@ namespace simulator {
             this->environment->size,
             std::make_pair(
               std::vector<std::int64_t>(this->humans->size(), -1),
-              std::vector<std::int64_t>(this->mosquitos->size(), -1))))) {}
+              std::vector<std::int64_t>(this->mosquitos->size(), -1))))),
+      states(std::make_unique<std::vector<State>>()) {}
+
+  auto Simulation::prepare() noexcept -> void {
+    insertion();
+  }
+
+  auto Simulation::iterate() noexcept -> std::optional<const State* const> {
+    if (iteration >= parameters->cycles) {
+      return std::nullopt;
+    }
+
+    movement();
+    contact();
+    transition();
+    auto& state = output();
+
+    // TFW no std::optional in C++ :(
+    return &state;
+  }
 
   auto Simulation::run() noexcept -> void {
     const auto cycles = parameters->cycles;
 
-    auto start = std::chrono::high_resolution_clock::now();
     insertion();
-    std::cout << "Insertion: "
-              << std::chrono::duration_cast<std::chrono::milliseconds>(
-                   std::chrono::high_resolution_clock::now() - start)
-                   .count()
-              << "ms" << std::endl;
     for (std::size_t i = 0; i < cycles; i++) {
-      auto start = std::chrono::high_resolution_clock::now();
       movement();
-      std::cout << "Movement: "
-                << std::chrono::duration_cast<std::chrono::milliseconds>(
-                     std::chrono::high_resolution_clock::now() - start)
-                     .count()
-                << "ms" << std::endl;
-      start = std::chrono::high_resolution_clock::now();
       contact();
-      std::cout << "Contact: "
-                << std::chrono::duration_cast<std::chrono::milliseconds>(
-                     std::chrono::high_resolution_clock::now() - start)
-                     .count()
-                << "ms" << std::endl;
-      start = std::chrono::high_resolution_clock::now();
       transition();
-      std::cout << "Transition: "
-                << std::chrono::duration_cast<std::chrono::milliseconds>(
-                     std::chrono::high_resolution_clock::now() - start)
-                     .count()
-                << "ms" << std::endl;
-      start = std::chrono::high_resolution_clock::now();
-      output();
-      std::cout << "Output: "
-                << std::chrono::duration_cast<std::chrono::milliseconds>(
-                     std::chrono::high_resolution_clock::now() - start)
-                     .count()
-                << "ms" << std::endl;
+      auto _ = output();
     }
   }
 
@@ -93,8 +79,7 @@ namespace simulator {
       [random_human_position, humans = humans.get(),
        agents_in_position = agents_in_position.get()](auto i) mutable noexcept {
         const auto position = random_human_position(i);
-        (*humans)[i] =
-          agent::Human { agent::Human::State::Susceptible, i, position, 0 };
+        (*humans)[i] = Human { Human::State::Susceptible, i, position, 0 };
         std::get<0>((*agents_in_position)[position])[i] = i;
       };
 
@@ -104,8 +89,8 @@ namespace simulator {
        inital_index =
          parameters->human_initial_infected](auto i) mutable noexcept {
         const auto idx = inital_index + i;
-        (*humans)[idx] = agent::Human { agent::Human::State::Infected, idx,
-                                        random_human_position(idx), 0 };
+        (*humans)[idx] =
+          Human { Human::State::Infected, idx, random_human_position(idx), 0 };
         std::get<0>((*agents_in_position)[(*humans)[idx].position])[idx] = idx;
       };
 
@@ -115,8 +100,8 @@ namespace simulator {
        inital_index =
          parameters->human_initial_susceptible](auto i) mutable noexcept {
         const auto idx = inital_index + i;
-        (*humans)[idx] = agent::Human { agent::Human::State::Exposed, idx,
-                                        random_human_position(idx), 0 };
+        (*humans)[idx] =
+          Human { Human::State::Exposed, idx, random_human_position(idx), 0 };
         std::get<0>((*agents_in_position)[(*humans)[idx].position])[idx] = idx;
       };
 
@@ -126,8 +111,8 @@ namespace simulator {
        inital_index = parameters->human_initial_infected +
          parameters->human_initial_exposed](auto i) mutable noexcept {
         const auto idx = inital_index + i;
-        (*humans)[idx] = agent::Human { agent::Human::State::Recovered, idx,
-                                        random_human_position(idx), 0 };
+        (*humans)[idx] =
+          Human { Human::State::Recovered, idx, random_human_position(idx), 0 };
         std::get<0>((*agents_in_position)[(*humans)[idx].position])[idx] = idx;
       };
 
@@ -138,8 +123,8 @@ namespace simulator {
     const auto insert_susceptible_mosquito =
       [random_mosquito_position, mosquitos = this->mosquitos.get(),
        agents_in_position = agents_in_position.get()](auto i) mutable noexcept {
-        (*mosquitos)[i] = agent::Mosquito { agent::Mosquito::State::Susceptible,
-                                            i, random_mosquito_position(i), 0 };
+        (*mosquitos)[i] = Mosquito { Mosquito::State::Susceptible, i,
+                                     random_mosquito_position(i), 0 };
         std::get<1>((*agents_in_position)[(*mosquitos)[i].position])[i] = i;
       };
 
@@ -149,9 +134,8 @@ namespace simulator {
        inital_index =
          parameters->mosquito_initial_susceptible](auto i) mutable noexcept {
         const auto idx = inital_index + i;
-        (*mosquitos)[idx] =
-          agent::Mosquito { agent::Mosquito::State::Infected, idx,
-                            random_mosquito_position(idx), 0 };
+        (*mosquitos)[idx] = Mosquito { Mosquito::State::Infected, idx,
+                                       random_mosquito_position(idx), 0 };
         std::get<1>((*agents_in_position)[(*mosquitos)[idx].position])[idx] =
           idx;
       };
@@ -162,40 +146,39 @@ namespace simulator {
        inital_index = parameters->mosquito_initial_susceptible +
          parameters->mosquito_initial_infected](auto i) mutable noexcept {
         const auto idx = inital_index + i;
-        (*mosquitos)[idx] =
-          agent::Mosquito { agent::Mosquito::State::Recovered, idx,
-                            random_mosquito_position(idx), 0 };
+        (*mosquitos)[idx] = Mosquito { Mosquito::State::Recovered, idx,
+                                       random_mosquito_position(idx), 0 };
         std::get<1>((*agents_in_position)[(*mosquitos)[idx].position])[idx] =
           idx;
       };
 
     const auto work = stdexec::when_all(
       stdexec::just() |
-        exec::on(gpu,
+        exec::on(gpu.get_scheduler(),
                  stdexec::bulk(parameters->human_initial_susceptible,
                                insert_susceptible_human)),
       stdexec::just() |
-        exec::on(gpu,
+        exec::on(gpu.get_scheduler(),
                  stdexec::bulk(parameters->human_initial_exposed,
                                insert_exposed_human)),
       stdexec::just() |
-        exec::on(gpu,
+        exec::on(gpu.get_scheduler(),
                  stdexec::bulk(parameters->human_initial_infected,
                                insert_infected_human)),
       stdexec::just() |
-        exec::on(gpu,
+        exec::on(gpu.get_scheduler(),
                  stdexec::bulk(parameters->human_initial_recovered,
                                insert_recovered_human)),
       stdexec::just() |
-        exec::on(gpu,
+        exec::on(gpu.get_scheduler(),
                  stdexec::bulk(parameters->mosquito_initial_susceptible,
                                insert_susceptible_mosquito)),
       stdexec::just() |
-        exec::on(gpu,
+        exec::on(gpu.get_scheduler(),
                  stdexec::bulk(parameters->mosquito_initial_infected,
                                insert_infected_mosquito)),
       stdexec::just() |
-        exec::on(gpu,
+        exec::on(gpu.get_scheduler(),
                  stdexec::bulk(parameters->mosquito_initial_recovered,
                                insert_recovered_mosquito)));
 
@@ -234,7 +217,8 @@ namespace simulator {
       };
 
     const auto work = stdexec::transfer_when_all(
-      gpu, stdexec::just() | stdexec::bulk(humans->size(), human_movement),
+      gpu.get_scheduler(),
+      stdexec::just() | stdexec::bulk(humans->size(), human_movement),
       stdexec::just() | stdexec::bulk(mosquitos->size(), mosquito_movement));
 
     stdexec::sync_wait(std::move(work));
@@ -277,16 +261,16 @@ namespace simulator {
             auto& human = (*humans)[human_id];
             auto& mosquito = (*mosquitos)[mosquito_id];
 
-            if (human.state == agent::Human::State::Susceptible &&
-                mosquito.state == agent::Mosquito::State::Infected &&
+            if (human.state == Human::State::Susceptible &&
+                mosquito.state == Mosquito::State::Infected &&
                 random_probability(human_id) <
                   parameters->human_infection_rate) {
-              human.state = agent::Human::State::Exposed;
-            } else if (human.state == agent::Human::State::Infected &&
-                       mosquito.state == agent::Mosquito::State::Susceptible &&
+              human.state = Human::State::Exposed;
+            } else if (human.state == Human::State::Infected &&
+                       mosquito.state == Mosquito::State::Susceptible &&
                        random_probability(mosquito_id) <
                          parameters->mosquito_infection_rate) {
-              mosquito.state = agent::Mosquito::State::Infected;
+              mosquito.state = Mosquito::State::Infected;
             }
           }
         }
@@ -302,17 +286,16 @@ namespace simulator {
             if (mosquito_id != mosquito_id2) {
               auto& mosquito = (*mosquitos)[mosquito_id];
               auto& mosquito2 = (*mosquitos)[mosquito_id2];
-              if (mosquito.state == agent::Mosquito::State::Infected &&
-                  mosquito2.state == agent::Mosquito::State::Susceptible &&
+              if (mosquito.state == Mosquito::State::Infected &&
+                  mosquito2.state == Mosquito::State::Susceptible &&
                   random_probability(mosquito.id) <
                     parameters->mosquito_infection_rate) {
-                mosquito2.state = agent::Mosquito::State::Infected;
-              } else if (mosquito.state ==
-                           agent::Mosquito::State::Susceptible &&
-                         mosquito2.state == agent::Mosquito::State::Infected &&
+                mosquito2.state = Mosquito::State::Infected;
+              } else if (mosquito.state == Mosquito::State::Susceptible &&
+                         mosquito2.state == Mosquito::State::Infected &&
                          random_probability(mosquito2.id) <
                            parameters->mosquito_infection_rate) {
-                mosquito.state = agent::Mosquito::State::Infected;
+                mosquito.state = Mosquito::State::Infected;
               }
             }
           }
@@ -320,14 +303,15 @@ namespace simulator {
       };
 
     const auto work1 = stdexec::just() |
-      exec::on(cpu,
+      exec::on(cpu.get_scheduler(),
                stdexec::bulk(environment->size, generate_agents_in_position));
 
     const auto work2 = stdexec::when_all(
       stdexec::just() |
-        exec::on(gpu, stdexec::bulk(environment->size, human_mosquito_contact)),
+        exec::on(gpu.get_scheduler(),
+                 stdexec::bulk(environment->size, human_mosquito_contact)),
       stdexec::just() |
-        exec::on(gpu,
+        exec::on(gpu.get_scheduler(),
                  stdexec::bulk(environment->size, mosquito_mosquito_contact)));
 
     stdexec::sync_wait(std::move(work1));
@@ -341,31 +325,31 @@ namespace simulator {
       auto& human = (*humans)[i];
 
       switch (human.state) {
-        case agent::Human::State::Exposed:
+        case Human::State::Exposed:
           if (human.counter >= parameters->human_transition_period_exposed) {
-            human.state = agent::Human::State::Infected;
+            human.state = Human::State::Infected;
             human.counter = 0;
           } else {
             human.counter++;
           }
           break;
-        case agent::Human::State::Infected:
+        case Human::State::Infected:
           if (human.counter >= parameters->human_transition_period_infected) {
-            human.state = agent::Human::State::Recovered;
+            human.state = Human::State::Recovered;
             human.counter = 0;
           } else {
             human.counter++;
           }
           break;
-        case agent::Human::State::Recovered:
+        case Human::State::Recovered:
           if (human.counter >= parameters->human_transition_period_recovered) {
-            human.state = agent::Human::State::Susceptible;
+            human.state = Human::State::Susceptible;
             human.counter = 0;
           } else {
             human.counter++;
           }
           break;
-        case agent::Human::State::Susceptible:
+        case Human::State::Susceptible:
           human.counter++;
           break;
       }
@@ -377,25 +361,25 @@ namespace simulator {
       auto& mosquito = (*mosquitos)[i];
 
       switch (mosquito.state) {
-        case agent::Mosquito::State::Infected:
+        case Mosquito::State::Infected:
           if (mosquito.counter >=
               parameters->mosquito_transition_period_infected) {
-            mosquito.state = agent::Mosquito::State::Recovered;
+            mosquito.state = Mosquito::State::Recovered;
             mosquito.counter = 0;
           } else {
             mosquito.counter++;
           }
           break;
-        case agent::Mosquito::State::Recovered:
+        case Mosquito::State::Recovered:
           if (mosquito.counter >=
               parameters->mosquito_transition_period_recovered) {
-            mosquito.state = agent::Mosquito::State::Susceptible;
+            mosquito.state = Mosquito::State::Susceptible;
             mosquito.counter = 0;
           } else {
             mosquito.counter++;
           }
           break;
-        case agent::Mosquito::State::Susceptible:
+        case Mosquito::State::Susceptible:
           mosquito.counter++;
           break;
       }
@@ -403,14 +387,16 @@ namespace simulator {
 
     const auto work = stdexec::when_all(
       stdexec::just() |
-        exec::on(gpu, stdexec::bulk(humans->size(), human_transition)),
+        exec::on(gpu.get_scheduler(),
+                 stdexec::bulk(humans->size(), human_transition)),
       stdexec::just() |
-        exec::on(gpu, stdexec::bulk(mosquitos->size(), mosquito_transition)));
+        exec::on(gpu.get_scheduler(),
+                 stdexec::bulk(mosquitos->size(), mosquito_transition)));
 
     stdexec::sync_wait(std::move(work));
   }
 
-  auto Simulation::output() noexcept -> State {
+  auto Simulation::output() noexcept -> const State& {
     auto humans_in_states = std::transform_reduce(
       std::execution::par_unseq, std::begin(*humans), std::end(*humans),
       std::make_tuple<std::size_t, std::size_t, std::size_t, std::size_t>(
@@ -426,10 +412,10 @@ namespace simulator {
       [](const auto& human) {
         return std::make_tuple<std::size_t, std::size_t, std::size_t,
                                std::size_t>(
-          human.state == agent::Human::State::Susceptible ? 1 : 0,
-          human.state == agent::Human::State::Exposed ? 1 : 0,
-          human.state == agent::Human::State::Infected ? 1 : 0,
-          human.state == agent::Human::State::Recovered ? 1 : 0);
+          human.state == Human::State::Susceptible ? 1 : 0,
+          human.state == Human::State::Exposed ? 1 : 0,
+          human.state == Human::State::Infected ? 1 : 0,
+          human.state == Human::State::Recovered ? 1 : 0);
       });
 
     auto mosquitos_in_states = std::transform_reduce(
@@ -443,14 +429,28 @@ namespace simulator {
       },
       [](const auto& mosquito) {
         return std::make_tuple<std::size_t, std::size_t, std::size_t>(
-          mosquito.state == agent::Mosquito::State::Susceptible ? 1 : 0,
-          mosquito.state == agent::Mosquito::State::Infected ? 1 : 0,
-          mosquito.state == agent::Mosquito::State::Recovered ? 1 : 0);
+          mosquito.state == Mosquito::State::Susceptible ? 1 : 0,
+          mosquito.state == Mosquito::State::Infected ? 1 : 0,
+          mosquito.state == Mosquito::State::Recovered ? 1 : 0);
       });
 
-    return State { { ++iteration, parameters->cycles },
-                   humans_in_states,
-                   mosquitos_in_states };
+    states->push_back({
+      { ++iteration, parameters->cycles },
+      humans_in_states,
+      mosquitos_in_states,
+    });
+
+    // copy all humans to the states
+    std::copy(std::begin(*humans), std::end(*humans),
+              std::back_inserter(states->back().humans));
+    std::copy(std::begin(*mosquitos), std::end(*mosquitos),
+              std::back_inserter(states->back().mosquitos));
+
+    return states->back();
+  }
+
+  auto Simulation::get_states() noexcept -> const std::vector<State>& {
+    return *states;
   }
 
 } // namespace simulator
