@@ -54,11 +54,12 @@ add_packages("cmake::NVHPC")
 -- [[ Project dependencies and repositories ]]
 local simulator_deps = { "nlohmann_json", "stdexec" }
 local simula_cli_deps = { "stdexec", "argparse", "indicators" };
+local bench_deps = { "stdexec", "argparse" }
 
 add_requires(table.unpack(simulator_deps))
 add_requires(table.unpack(simula_cli_deps))
 -- add_requires(table.unpack(test_deps))
--- add_requires(table.unpack(bench_deps))
+add_requires(table.unpack(bench_deps))
 
 
 -- [[ Project targets ]]
@@ -66,8 +67,8 @@ target("simulator", function()
   set_kind("static")
   add_files("src/simulator/*.cpp", "src/simulator/**/*.cpp")
   add_packages(table.unpack(simulator_deps))
-  -- set_targetdir("./simulator")
-  -- set_installdir("./simulator")
+  set_targetdir("./simulator")
+  set_installdir("./simulator")
 end)
 
 
@@ -76,6 +77,15 @@ target("simula_cli", function()
   add_files("src/simula_cli/*.cpp")
   add_packages(table.unpack(simula_cli_deps))
   add_deps("simulator")
-  -- set_targetdir("./simulator")
-  -- set_installdir("./simulator")
+  set_targetdir("./simulator")
+  set_installdir("./simulator")
+end)
+
+target("bench", function()
+  set_kind("binary")
+  add_files("src/bench/*.cpp")
+  add_packages(table.unpack(bench_deps))
+  add_deps("simulator")
+  set_targetdir("./simulator")
+  set_installdir("./simulator")
 end)
