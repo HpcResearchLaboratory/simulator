@@ -33,7 +33,7 @@ add_requires("cmake::NVHPC",
         "HOSTUTILS",
         "NVSHMEM",
         "NCCL",
-        "MPI",
+        -- "MPI",
         "PROFILER"
       },
       link_libraries = {
@@ -42,7 +42,7 @@ add_requires("cmake::NVHPC",
         "NVHPC::HOSTUTILS",
         "NVHPC::NVSHMEM",
         "NVHPC::NCCL",
-        "NVHPC::MPI",
+        -- "NVHPC::MPI",
         "NVHPC::PROFILER"
       }
     }
@@ -53,8 +53,8 @@ add_packages("cmake::NVHPC")
 
 -- [[ Project dependencies and repositories ]]
 local simulator_deps = { "nlohmann_json", "stdexec" }
-local simula_cli_deps = { "stdexec", "argparse", "indicators" };
-local bench_deps = { "stdexec", "argparse" }
+local simula_cli_deps = { "nlohmann_json", "stdexec", "argparse", "indicators" };
+local bench_deps = { "nlohmann_json", "stdexec", "argparse" }
 
 add_requires(table.unpack(simulator_deps))
 add_requires(table.unpack(simula_cli_deps))
