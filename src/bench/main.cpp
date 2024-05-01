@@ -25,11 +25,19 @@ auto main(int argc, char* argv[]) -> int {
     .default_value(fs::path { "./assets/output/small" })
     .action([](const std::string& value) -> fs::path { return value; });
 
+  program.add_argument("-t", "--threads")
+    .help("Number of threads")
+    .default_value(std::thread::hardware_concurrency())
+    .action([](const std::string& value) -> std::size_t {
+      return std::stoul(value);
+    });
+
   try {
     program.parse_args(argc, argv);
 
     const auto input_path = program.get<fs::path>("--input");
     const auto output_path = program.get<fs::path>("--output");
+    const auto threads = program.get<std::size_t>("--threads");
 
     auto environment_input_file =
       std::ifstream { fs::path { input_path } / "environment.json" };
@@ -48,10 +56,9 @@ auto main(int argc, char* argv[]) -> int {
 
     std::cout << "Environment: " << environment.size << std::endl;
 
-    auto simulation = simulator::Simulation {
+    auto simulation = simulator::Simulation(
       std::make_shared<simulator::Environment>(environment),
-      std::make_shared<simulator::Parameters>(parameters)
-    };
+      std::make_shared<simulator::Parameters>(parameters), threads);
 
     simulation.run();
 
