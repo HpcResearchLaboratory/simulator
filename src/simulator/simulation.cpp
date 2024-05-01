@@ -66,7 +66,7 @@ namespace simulator {
       movement();
       contact();
       transition();
-      auto _ = output();
+      /*auto _ = output();*/
     }
   }
 
