@@ -62,10 +62,9 @@ auto main(int argc, char* argv[]) -> int {
         std::launch::async,
         [environment, parameters, &progress_bars, simulation_path,
          output_path] {
-          auto simulation = simulator::Simulation {
+          auto simulation = simulator::Simulation(
             std::make_shared<simulator::Environment>(environment),
-            std::make_shared<simulator::Parameters>(parameters)
-          };
+            std::make_shared<simulator::Parameters>(parameters));
 
           std::string agents_in_states_text = " [Humans{S:" +
             std::to_string(parameters.human_initial_susceptible) +
