@@ -1,0 +1,20 @@
+#!/bin/env bash
+
+BENCHMARKS_DIR=${1:-"./assets/benchmarks"}
+
+# Case 1: gpu sync vs async
+mkdir -p "$BENCHMARKS_DIR"/case1
+
+# Case 1.1: sync
+xmake clean -a
+xmake f --sync=y
+xmake build -r bench
+mv ./simulator/bench "$BENCHMARKS_DIR"/case1/sync
+
+# Case 1.2: async
+xmake clean -a
+xmake f --sync=n
+xmake build -r bench
+mv ./simulator/bench "$BENCHMARKS_DIR"/case1/async
+
+xmake clean -a

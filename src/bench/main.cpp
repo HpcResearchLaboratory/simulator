@@ -27,7 +27,8 @@ auto main(int argc, char* argv[]) -> int {
 
   program.add_argument("-t", "--threads")
     .help("Number of threads")
-    .default_value(std::thread::hardware_concurrency())
+    .default_value(
+      static_cast<std::size_t>(std::thread::hardware_concurrency()))
     .action([](const std::string& value) -> std::size_t {
       return std::stoul(value);
     });
@@ -49,19 +50,14 @@ auto main(int argc, char* argv[]) -> int {
     const auto parameters_data =
       std::string { std::istreambuf_iterator<char> { parameters_input_file },
                     std::istreambuf_iterator<char> {} };
-
     const auto parameters = simulator::Parameters::from_json(parameters_data);
     const auto environment =
       simulator::Environment::from_geojson(environment_data);
-
-    std::cout << "Environment: " << environment.size << std::endl;
-
+    std::cout  << environment.size << std::endl;
     auto simulation = simulator::Simulation(
       std::make_shared<simulator::Environment>(environment),
       std::make_shared<simulator::Parameters>(parameters), threads);
-
     simulation.run();
-
   } catch (const std::exception& e) {
     std::cerr << e.what() << std::endl;
     return 1;

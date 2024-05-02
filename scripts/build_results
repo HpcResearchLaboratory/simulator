@@ -1,0 +1,39 @@
+#!/bin/env bash
+
+BENCHMARKS_DIR=${1:-"./assets/benchmarks"}
+RESULTS_DIR=${1:-"./assets/results"}
+
+# Case 1: gpu sync vs async
+mkdir -p "$RESULTS_DIR"/case1/{nsys,hyperfine}
+
+# Case 1.1: NVIDIA nsight systems
+# Case 1.1.1: sync
+nsys profile \
+  --trace cuda,nvtx,mpi,oshmem,openacc,openmp \
+  --cuda-memory-usage=true \
+  --gpuctxsw=true \
+  -o "$RESULTS_DIR"/case1/nsys/sync.nsys-rep \
+  "${BENCHMARKS_DIR}"/case1/sync -i ./assets/input/small
+
+# Case 1.1.2: async
+CUDA_VISIBLE_DEVICES=0 nsys profile \
+  --trace cuda,nvtx,mpi,oshmem,openacc,openmp \
+  -o "$RESULTS_DIR"/case1/nsys/async_1gpu.nsys-rep \
+  "${BENCHMARKS_DIR}"/case1/async -i ./assets/input/small
+
+# Caso 1.1.3: async 2 GPUs
+CUDA_VISIBLE_DEVICES=0,1 nsys profile \
+  --trace cuda,nvtx,mpi,oshmem,openacc,openmp \
+  -o "$RESULTS_DIR"/case1/nsys/async_2gpu.nsys-rep \
+  "${BENCHMARKS_DIR}"/case1/async -i ./assets/input/small
+
+# Case 1.2: hyperfine comparsion
+hyperfine \
+  "CUDA_VISIBLE_DEVICES=0 ${BENCHMARKS_DIR}/case1/async -i ./assets/input/small" \
+  --command-name async_1gpu \
+  "CUDA_VISIBLE_DEVICES=0,1 ${BENCHMARKS_DIR}/case1/async -i ./assets/input/small" \
+  --command-name async_2gpu \
+  --warmup 3 \
+  --export-json "$RESULTS_DIR"/case1/hyperfine/comparison.json \
+  --export-markdown "$RESULTS_DIR"/case1/hyperfine/comparison.md \
+  --export-csv "$RESULTS_DIR"/case1/hyperfine/comparison.csv
