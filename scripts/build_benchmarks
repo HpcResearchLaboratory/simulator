@@ -18,3 +18,34 @@ xmake build -r bench
 mv ./simulator/bench "$BENCHMARKS_DIR"/case1/async
 
 xmake clean -a
+
+
+# Case 2: operators on cpu
+mkdir -p "$BENCHMARKS_DIR"/case2
+
+# Case 2.1: insertion on cpu
+xmake clean -a
+xmake f --insertion_cpu=y 
+xmake build -r bench
+mv ./simulator/bench "$BENCHMARKS_DIR"/case2/insertion
+
+# Case 2.2: movement on cpu
+xmake clean -a
+xmake f --movement_cpu=y 
+xmake build -r bench
+mv ./simulator/bench "$BENCHMARKS_DIR"/case2/movement
+
+# Case 2.3: contact on cpu
+xmake clean -a
+xmake f --contact_cpu=y 
+xmake build -r bench
+mv ./simulator/bench "$BENCHMARKS_DIR"/case2/contact
+
+# Case 2.4: transition on cpu
+xmake clean -a
+xmake f --transition_cpu=y 
+xmake build -r bench
+mv ./simulator/bench "$BENCHMARKS_DIR"/case2/transition
+
+# cleanup
+xmake clean -a
