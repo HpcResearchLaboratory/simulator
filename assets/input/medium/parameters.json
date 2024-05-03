@@ -10,7 +10,7 @@
   "human_transition_period_infected": [14, 21],
   "human_transition_period_recovered": [7, 14],
   "mosquito_infection_rate": [0.1, 0.3],
-  "mosquito_initial_susceptible": [10000, 10000],
+  "mosquito_initial_susceptible": [1000, 1000],
   "mosquito_initial_infected": [1000, 1000],
   "mosquito_initial_recovered": [1000, 1000],
   "mosquito_transition_period_infected": [14, 21],
