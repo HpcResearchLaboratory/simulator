@@ -47,3 +47,21 @@ for i in small medium large larger; do
     --export-markdown "$RESULTS_DIR"/case1/hyperfine/${i}/comparison.md \
     --export-csv "$RESULTS_DIR"/case1/hyperfine/${i}/comparison.csv
 done
+
+
+# Case 2: operators on cpu
+mkdir -p "$RESULTS_DIR"/case2/{nsys,hyperfine}/{small,medium,large,larger}
+
+# Case 2.1: insertion on cpu
+for i in small medium large larger; do
+  hyperfine \
+    -L threads 1 2 4 8 16 32 64 128 \
+    "${BENCHMARKS_DIR}/case2/insertion -i ./assets/input/${i} --threads {threads}" \
+    --command-name insertion_cpu \
+    "CUDA_VISIBLE_DEVICES=0,1 ${BENCHMARKS_DIR}/case1/async -i ./assets/input/${i}" \
+    --command-name insertion_gpu \
+    --warmup 3 \
+    --export-json "$RESULTS_DIR"/case2/hyperfine/${i}/insertion.json \
+    --export-markdown "$RESULTS_DIR"/case2/hyperfine/${i}/insertion.md \
+    --export-csv "$RESULTS_DIR"/case2/hyperfine/${i}/insertion.csv
+done
