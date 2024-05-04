@@ -7,36 +7,30 @@ RESULTS_DIR=${1:-"./assets/results"}
 mkdir -p "$RESULTS_DIR"/case1/{nsys,hyperfine}/{small,medium,large,larger}
 
 # Case 1.1: NVIDIA nsight systems
-# Case 1.1.1: sync
 for i in small medium large larger; do
-  nsys profile \
+  # Case 1.1.1: sync
+  CUDA_VISIBLE_DEVICES=0 nsys profile \
     --trace cuda,nvtx,mpi,oshmem,openacc,openmp \
     --cuda-memory-usage=true \
     --gpuctxsw=true \
     -o "$RESULTS_DIR"/case1/nsys/${i}/sync.nsys-rep \
     "${BENCHMARKS_DIR}"/case1/sync -i ./assets/input/"$i"
-done
 
-# Case 1.1.2: async
-for i in small medium large larger; do
+  # Case 1.1.2: async
   CUDA_VISIBLE_DEVICES=0 nsys profile \
     --trace cuda,nvtx,mpi,oshmem,openacc,openmp \
     -o "$RESULTS_DIR"/case1/nsys/${i}/async_1gpu.nsys-rep \
     "${BENCHMARKS_DIR}"/case1/async -i ./assets/input/"$i"
-done
 
-# Caso 1.1.3: async 2 GPUs
-for i in small medium large larger; do
+  # Caso 1.1.3: async 2 GPUs
   CUDA_VISIBLE_DEVICES=0,1 nsys profile \
     --trace cuda,nvtx,mpi,oshmem,openacc,openmp \
     -o "$RESULTS_DIR"/case1/nsys/${i}/async_2gpu.nsys-rep \
     "${BENCHMARKS_DIR}"/case1/async -i ./assets/input/"$i"
-done
 
-# Case 1.2: hyperfine comparsion
-for i in small medium large larger; do
+  # Case 1.2: hyperfine comparsion
   hyperfine \
-    "${BENCHMARKS_DIR}/case1/sync -i ./assets/input/${i}" \
+    "CUDA_VISIBLE_DEVICES=0 ${BENCHMARKS_DIR}/case1/sync -i ./assets/input/${i}" \
     --command-name sync \
     "CUDA_VISIBLE_DEVICES=0 ${BENCHMARKS_DIR}/case1/async -i ./assets/input/${i}" \
     --command-name async_1gpu \
@@ -49,19 +43,72 @@ for i in small medium large larger; do
 done
 
 
-# Case 2: operators on cpu
-mkdir -p "$RESULTS_DIR"/case2/{nsys,hyperfine}/{small,medium,large,larger}
+# Case 2: operators on cpu vs gpu
+mkdir -p "$RESULTS_DIR"/case2/{nsys,hyperfine}/{small,medium,large,larger}/{insertion,movement,contact,transition}
 
-# Case 2.1: insertion on cpu
 for i in small medium large larger; do
+  nsys profile \
+    --trace cuda,nvtx,mpi,oshmem,openacc,openmp \
+    --cuda-memory-usage=true \
+    --gpuctxsw=true \
+    -o "$RESULTS_DIR"/case2/nsys/${i}/insertion_cpu.nsys-rep \
+    "${BENCHMARKS_DIR}"/case2/insertion -i ./assets/input/"$i"
+
   hyperfine \
-    -L threads 1 2 4 8 16 32 64 128 \
-    "${BENCHMARKS_DIR}/case2/insertion -i ./assets/input/${i} --threads {threads}" \
-    --command-name insertion_cpu \
-    "CUDA_VISIBLE_DEVICES=0,1 ${BENCHMARKS_DIR}/case1/async -i ./assets/input/${i}" \
+    "${BENCHMARKS_DIR}/case1/async -i ./assets/input/${i}" \
     --command-name insertion_gpu \
+    "${BENCHMARKS_DIR}/case2/insertion -i ./assets/input/${i}" \
+    --command-name insertion_cpu \
     --warmup 3 \
-    --export-json "$RESULTS_DIR"/case2/hyperfine/${i}/insertion.json \
-    --export-markdown "$RESULTS_DIR"/case2/hyperfine/${i}/insertion.md \
-    --export-csv "$RESULTS_DIR"/case2/hyperfine/${i}/insertion.csv
+    --export-json "$RESULTS_DIR"/case2/hyperfine/${i}/insertion/comparison.json \
+    --export-markdown "$RESULTS_DIR"/case2/hyperfine/${i}/insertion/comparison.md \
+    --export-csv "$RESULTS_DIR"/case2/hyperfine/${i}/insertion/comparison.csv
+
+  nsys profile \
+    --trace cuda,nvtx,mpi,oshmem,openacc,openmp \
+    --cuda-memory-usage=true \
+    --gpuctxsw=true \
+    -o "$RESULTS_DIR"/case2/nsys/${i}/movement_cpu.nsys-rep \
+    "${BENCHMARKS_DIR}"/case2/movement -i ./assets/input/"$i"
+  hyperfine \
+    "${BENCHMARKS_DIR}/case1/async -i ./assets/input/${i}" \
+    --command-name movement_gpu \
+    "${BENCHMARKS_DIR}/case2/movement -i ./assets/input/${i}" \
+    --command-name movement_cpu \
+    --warmup 3 \
+    --export-json "$RESULTS_DIR"/case2/hyperfine/${i}/movement/comparison.json \
+    --export-markdown "$RESULTS_DIR"/case2/hyperfine/${i}/movement/comparison.md \
+    --export-csv "$RESULTS_DIR"/case2/hyperfine/${i}/movement/comparison.csv
+
+  nsys profile \
+    --trace cuda,nvtx,mpi,oshmem,openacc,openmp \
+    --cuda-memory-usage=true \
+    --gpuctxsw=true \
+    -o "$RESULTS_DIR"/case2/nsys/${i}/contact_cpu.nsys-rep \
+    "${BENCHMARKS_DIR}"/case2/contact -i ./assets/input/"$i"
+  hyperfine \
+    "${BENCHMARKS_DIR}/case1/async -i ./assets/input/${i}" \
+    --command-name contact_gpu \
+    "${BENCHMARKS_DIR}/case2/contact -i ./assets/input/${i}" \
+    --command-name contact_cpu \
+    --warmup 3 \
+    --export-json "$RESULTS_DIR"/case2/hyperfine/${i}/contact/comparison.json \
+    --export-markdown "$RESULTS_DIR"/case2/hyperfine/${i}/contact/comparison.md \
+    --export-csv "$RESULTS_DIR"/case2/hyperfine/${i}/contact/comparison.csv
+
+  nsys profile \
+    --trace cuda,nvtx,mpi,oshmem,openacc,openmp \
+    --cuda-memory-usage=true \
+    --gpuctxsw=true \
+    -o "$RESULTS_DIR"/case2/nsys/${i}/transition_cpu.nsys-rep \
+    "${BENCHMARKS_DIR}"/case2/transition -i ./assets/input/"$i"
+  hyperfine \
+    "${BENCHMARKS_DIR}/case1/async -i ./assets/input/${i}" \
+    --command-name transition_gpu \
+    "${BENCHMARKS_DIR}/case2/transition -i ./assets/input/${i}" \
+    --command-name transition_cpu \
+    --warmup 3 \
+    --export-json "$RESULTS_DIR"/case2/hyperfine/${i}/transition/comparison.json \
+    --export-markdown "$RESULTS_DIR"/case2/hyperfine/${i}/transition/comparison.md \
+    --export-csv "$RESULTS_DIR"/case2/hyperfine/${i}/transition/comparison.csv
 done
