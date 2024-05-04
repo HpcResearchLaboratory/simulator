@@ -53,7 +53,7 @@ auto main(int argc, char* argv[]) -> int {
     const auto parameters = simulator::Parameters::from_json(parameters_data);
     const auto environment =
       simulator::Environment::from_geojson(environment_data);
-    std::cout  << environment.size << std::endl;
+    /*std::cout  << environment.size << std::endl;*/
     auto simulation = simulator::Simulation(
       std::make_shared<simulator::Environment>(environment),
       std::make_shared<simulator::Parameters>(parameters), threads);

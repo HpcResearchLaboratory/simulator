@@ -65,6 +65,7 @@ namespace simulator {
 
     insertion();
     for (std::size_t i = 0; i < cycles; i++) {
+      /*std::cout << "Cycle: " << i << std::endl;*/
       movement();
       contact();
       transition();

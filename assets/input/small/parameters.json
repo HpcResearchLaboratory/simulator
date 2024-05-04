@@ -1,6 +1,6 @@
 {
   "runs": 1,
-  "cycles": 1,
+  "cycles": 10,
   "human_infection_rate": [0.1, 0.3],
   "human_initial_susceptible": [1000, 1000],
   "human_initial_exposed": [100, 100],
