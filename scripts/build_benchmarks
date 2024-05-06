@@ -47,5 +47,12 @@ xmake f --transition_cpu=y
 xmake build -r bench
 mv ./simulator/bench "$BENCHMARKS_DIR"/case2/transition
 
+# Case 3: Async, contact on cpu
+mkdir -p "$BENCHMARKS_DIR"/case3
+xmake clean -a
+xmake f --sync=n --contact_cpu=y
+xmake build -r bench
+mv ./simulator/bench "$BENCHMARKS_DIR"/case3/simulation
+
 # cleanup
 xmake clean -a
