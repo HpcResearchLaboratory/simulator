@@ -1,0 +1,58 @@
+#!/bin/env bash
+
+BENCHMARKS_DIR=${1:-"./assets/benchmarks"}
+
+# Case 1: gpu sync vs async
+mkdir -p "$BENCHMARKS_DIR"/case1
+
+# Case 1.1: sync
+xmake clean -a
+xmake f --sync=y
+xmake build -r bench
+mv ./simulator/bench "$BENCHMARKS_DIR"/case1/sync
+
+# Case 1.2: async
+xmake clean -a
+xmake f --sync=n
+xmake build -r bench
+mv ./simulator/bench "$BENCHMARKS_DIR"/case1/async
+
+xmake clean -a
+
+
+# Case 2: operators on cpu
+mkdir -p "$BENCHMARKS_DIR"/case2
+
+# Case 2.1: insertion on cpu
+xmake clean -a
+xmake f --insertion_cpu=y 
+xmake build -r bench
+mv ./simulator/bench "$BENCHMARKS_DIR"/case2/insertion
+
+# Case 2.2: movement on cpu
+xmake clean -a
+xmake f --movement_cpu=y 
+xmake build -r bench
+mv ./simulator/bench "$BENCHMARKS_DIR"/case2/movement
+
+# Case 2.3: contact on cpu
+xmake clean -a
+xmake f --contact_cpu=y 
+xmake build -r bench
+mv ./simulator/bench "$BENCHMARKS_DIR"/case2/contact
+
+# Case 2.4: transition on cpu
+xmake clean -a
+xmake f --transition_cpu=y 
+xmake build -r bench
+mv ./simulator/bench "$BENCHMARKS_DIR"/case2/transition
+
+# Case 3: Async, contact on cpu
+mkdir -p "$BENCHMARKS_DIR"/case3
+xmake clean -a
+xmake f --sync=n --contact_cpu=y
+xmake build -r bench
+mv ./simulator/bench "$BENCHMARKS_DIR"/case3/simulation
+
+# cleanup
+xmake clean -a

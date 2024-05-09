@@ -40,8 +40,10 @@ namespace simulator {
     [[nodiscard]] auto output() noexcept -> const State&;
 
   public:
-    Simulation(std::shared_ptr<const Environment> environment,
-               std::shared_ptr<const Parameters> parameters) noexcept;
+    Simulation(
+      std::shared_ptr<const Environment> environment,
+      std::shared_ptr<const Parameters> parameters,
+      std::size_t threads = std::thread::hardware_concurrency()) noexcept;
     /**
      * @brief Run the simulation
      *
