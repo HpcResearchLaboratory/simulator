@@ -1,0 +1,125 @@
+#!/bin/env bash
+
+BENCHMARKS_DIR=${1:-"./assets/benchmarks"}
+RESULTS_DIR=${1:-"./assets/results"}
+
+
+# Case 1: sync vs async
+mkdir -p "$RESULTS_DIR"/case1/
+
+CUDA_VISIBLE_DEVICES=0 nsys profile \
+  --trace cuda,nvtx \
+  -o "$RESULTS_DIR"/case1/sync.nsys-rep \
+  "${BENCHMARKS_DIR}"/case1/sync -i ./assets/input/larger
+
+CUDA_VISIBLE_DEVICES=0,1 nsys profile \
+  --trace cuda,nvtx \
+  -o "$RESULTS_DIR"/case1/async.nsys-rep \
+  "${BENCHMARKS_DIR}"/case1/async -i ./assets/input/larger
+
+# Case 1.2: hyperfine comparsion
+hyperfine \
+  "CUDA_VISIBLE_DEVICES=0 ${BENCHMARKS_DIR}/case1/sync -i ./assets/input/larger" \
+  --command-name "síncrono" \
+  "CUDA_VISIBLE_DEVICES=0,1 ${BENCHMARKS_DIR}/case1/async -i ./assets/input/larger" \
+  --command-name "assíncrono" \
+  --warmup 3 \
+  --export-json "$RESULTS_DIR"/case1/comparison.json \
+  --export-markdown "$RESULTS_DIR"/case1/comparison.md \
+  --export-csv "$RESULTS_DIR"/case1/comparison.csv
+
+
+# Case 2: operators on cpu vs gpu
+mkdir -p "$RESULTS_DIR"/case2/
+
+nsys profile \
+  --trace cuda,nvtx \
+  -o "$RESULTS_DIR"/case2/insertion_cpu.nsys-rep \
+  "${BENCHMARKS_DIR}"/case2/insertion -i ./assets/input/larger
+
+hyperfine \
+  "${BENCHMARKS_DIR}/case1/async -i ./assets/input/larger" \
+  --command-name "inserção na GPU" \
+  "${BENCHMARKS_DIR}/case2/insertion -i ./assets/input/larger" \
+  --command-name "inserção na CPU" \
+  --warmup 3 \
+  --export-json "$RESULTS_DIR"/case2/insertion_comparison.json \
+  --export-markdown "$RESULTS_DIR"/case2/insertion_comparison.md \
+  --export-csv "$RESULTS_DIR"/case2/insertion_comparison.csv
+
+nsys profile \
+  --trace cuda,nvtx \
+  -o "$RESULTS_DIR"/case2/movement_cpu.nsys-rep \
+    "${BENCHMARKS_DIR}"/case2/movement -i ./assets/input/larger
+hyperfine \
+  "${BENCHMARKS_DIR}/case1/async -i ./assets/input/larger" \
+  --command-name "movimento na GPU" \
+  "${BENCHMARKS_DIR}/case2/movement -i ./assets/input/larger" \
+  --command-name "movimento na CPU" \
+  --warmup 3 \
+  --export-json "$RESULTS_DIR"/case2/movement_comparison.json \
+  --export-markdown "$RESULTS_DIR"/case2/movement_comparison.md \
+  --export-csv "$RESULTS_DIR"/case2/movement_comparison.csv
+
+nsys profile \
+  --trace cuda,nvtx \
+  -o "$RESULTS_DIR"/case2/contact_cpu.nsys-rep \
+  "${BENCHMARKS_DIR}"/case2/contact -i ./assets/input/larger
+hyperfine \
+  "${BENCHMARKS_DIR}/case1/async -i ./assets/input/larger" \
+  --command-name "contato na GPU" \
+  "${BENCHMARKS_DIR}/case2/contact -i ./assets/input/larger" \
+  --command-name "contato na CPU" \
+  --warmup 3 \
+  --export-json "$RESULTS_DIR"/case2/contact_comparison.json \
+  --export-markdown "$RESULTS_DIR"/case2/contact_comparison.md \
+  --export-csv "$RESULTS_DIR"/case2/contact_comparison.csv
+
+nsys profile \
+  --trace cuda,nvtx \
+  -o "$RESULTS_DIR"/case2/transition_gpu.nsys-rep \
+  "${BENCHMARKS_DIR}"/case2/transition -i ./assets/input/larger
+hyperfine \
+  "${BENCHMARKS_DIR}/case1/async -i ./assets/input/larger" \
+  --command-name "transição na GPU" \
+  "${BENCHMARKS_DIR}/case2/transition -i ./assets/input/larger" \
+  --command-name "transição na CPU" \
+  --warmup 3 \
+  --export-json "$RESULTS_DIR"/case2/transition_comparison.json \
+  --export-markdown "$RESULTS_DIR"/case2/transition_comparison.md \
+  --export-csv "$RESULTS_DIR"/case2/transition_comparison.csv
+
+# Case 3: Simulations comparison
+mkdir -p "$RESULTS_DIR"/case3/
+
+nsys profile \
+  --trace cuda,nvtx \
+  -o "$RESULTS_DIR"/case3/small.nsys-rep \
+  "${BENCHMARKS_DIR}"/case3/simulation -i ./assets/input/small
+nsys profile \
+  --trace cuda,nvtx \
+  -o "$RESULTS_DIR"/case3/medium.nsys-rep \
+  "${BENCHMARKS_DIR}"/case3/simulation -i ./assets/input/medium
+nsys profile \
+  --trace cuda,nvtx \
+  -o "$RESULTS_DIR"/case3/large.nsys-rep \
+  "${BENCHMARKS_DIR}"/case3/simulation -i ./assets/input/large
+nsys profile \
+  --trace cuda,nvtx \
+  -o "$RESULTS_DIR"/case3/larger.nsys-rep \
+  "${BENCHMARKS_DIR}"/case3/simulation -i ./assets/input/larger
+
+# Hyperfine Comparison
+hyperfine \
+  "${BENCHMARKS_DIR}/case3/simulation -i ./assets/input/small" \
+  --command-name "pequeno" \
+  "${BENCHMARKS_DIR}/case3/simulation -i ./assets/input/medium" \
+  --command-name "médio" \
+  "${BENCHMARKS_DIR}/case3/simulation -i ./assets/input/large" \
+  --command-name "grande" \
+  "${BENCHMARKS_DIR}/case3/simulation -i ./assets/input/larger" \
+  --command-name "muito grande" \
+  --warmup 3 \
+  --export-json "$RESULTS_DIR"/case3/comparison.json \
+  --export-markdown "$RESULTS_DIR"/case3/comparison.md \
+  --export-csv "$RESULTS_DIR"/case3/comparison.csv

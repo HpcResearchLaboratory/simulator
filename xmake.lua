@@ -33,7 +33,7 @@ add_requires("cmake::NVHPC",
         "HOSTUTILS",
         "NVSHMEM",
         "NCCL",
-        "MPI",
+        -- "MPI",
         "PROFILER"
       },
       link_libraries = {
@@ -42,7 +42,7 @@ add_requires("cmake::NVHPC",
         "NVHPC::HOSTUTILS",
         "NVHPC::NVSHMEM",
         "NVHPC::NCCL",
-        "NVHPC::MPI",
+        -- "NVHPC::MPI",
         "NVHPC::PROFILER"
       }
     }
@@ -53,21 +53,66 @@ add_packages("cmake::NVHPC")
 
 -- [[ Project dependencies and repositories ]]
 local simulator_deps = { "nlohmann_json", "stdexec" }
-local simula_cli_deps = { "stdexec", "argparse", "indicators" };
+local simula_cli_deps = { "nlohmann_json", "stdexec", "argparse", "indicators" };
+local bench_deps = { "nlohmann_json", "stdexec", "argparse" }
 
 add_requires(table.unpack(simulator_deps))
 add_requires(table.unpack(simula_cli_deps))
 -- add_requires(table.unpack(test_deps))
--- add_requires(table.unpack(bench_deps))
+add_requires(table.unpack(bench_deps))
 
+
+-- [[ options ]]
+option("sync", function()
+  set_default(false)
+  set_showmenu(true)
+  set_description("Enable synchronous execution")
+  add_defines("SYNC")
+end)
+
+option("gpus", function()
+  set_default("0,1")
+  set_showmenu(true)
+  set_description("CUDA_VISIBLE_DEVICES")
+end)
+
+option("insertion_cpu", function()
+  set_default(false)
+  set_showmenu(true)
+  set_description("Insertion on CPU")
+  add_defines("INSERTION_CPU")
+end)
+
+option("movement_cpu", function()
+  set_default(false)
+  set_showmenu(true)
+  set_description("Movement on CPU")
+  add_defines("MOVEMENT_CPU")
+end)
+
+option("contact_cpu", function()
+  set_default(false)
+  set_showmenu(true)
+  set_description("Contact on CPU")
+  add_defines("CONTACT_CPU")
+end)
+
+option("transition_cpu", function()
+  set_default(false)
+  set_showmenu(true)
+  set_description("Transition on CPU")
+  add_defines("TRANSITION_CPU")
+end)
 
 -- [[ Project targets ]]
 target("simulator", function()
   set_kind("static")
   add_files("src/simulator/*.cpp", "src/simulator/**/*.cpp")
   add_packages(table.unpack(simulator_deps))
-  -- set_targetdir("./simulator")
-  -- set_installdir("./simulator")
+  set_targetdir("./simulator")
+  set_installdir("./simulator")
+  add_options("sync", "gpus", "insertion_cpu", "movement_cpu", "contact_cpu", "transition_cpu")
+  add_runenvs("CUDA_VISIBLE_DEVICES", "$(gpus)")
 end)
 
 
@@ -76,6 +121,19 @@ target("simula_cli", function()
   add_files("src/simula_cli/*.cpp")
   add_packages(table.unpack(simula_cli_deps))
   add_deps("simulator")
-  -- set_targetdir("./simulator")
-  -- set_installdir("./simulator")
+  set_targetdir("./simulator")
+  set_installdir("./simulator")
+  add_options("sync", "gpus", "insertion_cpu", "movement_cpu", "contact_cpu", "transition_cpu")
+  add_runenvs("CUDA_VISIBLE_DEVICES", "$(gpus)")
+end)
+
+target("bench", function()
+  set_kind("binary")
+  add_files("src/bench/*.cpp")
+  add_packages(table.unpack(bench_deps))
+  add_deps("simulator")
+  set_targetdir("./simulator")
+  set_installdir("./simulator")
+  add_options("sync", "gpus", "insertion_cpu", "movement_cpu", "contact_cpu", "transition_cpu")
+  add_runenvs("CUDA_VISIBLE_DEVICES", "$(gpus)")
 end)

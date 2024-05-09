@@ -18,13 +18,15 @@
 
 namespace simulator {
   Simulation::Simulation(std::shared_ptr<const Environment> environment,
-                         std::shared_ptr<const Parameters> parameters) noexcept
+                         std::shared_ptr<const Parameters> parameters,
+                         std::size_t threads) noexcept
     : environment(std::move(environment)), parameters(std::move(parameters)),
-      cpu(1), gpu {}, humans(std::make_unique<std::vector<Human>>(
-                        this->parameters->human_initial_susceptible +
-                        this->parameters->human_initial_exposed +
-                        this->parameters->human_initial_infected +
-                        this->parameters->human_initial_recovered)),
+      cpu { static_cast<uint32_t>(threads) }, gpu {},
+      humans(std::make_unique<std::vector<Human>>(
+        this->parameters->human_initial_susceptible +
+        this->parameters->human_initial_exposed +
+        this->parameters->human_initial_infected +
+        this->parameters->human_initial_recovered)),
       mosquitos(std::make_unique<std::vector<Mosquito>>(
         this->parameters->mosquito_initial_susceptible +
         this->parameters->mosquito_initial_infected +
@@ -63,10 +65,11 @@ namespace simulator {
 
     insertion();
     for (std::size_t i = 0; i < cycles; i++) {
+      /*std::cout << "Cycle: " << i << std::endl;*/
       movement();
       contact();
       transition();
-      auto _ = output();
+      /*auto _ = output();*/
     }
   }
 
@@ -152,37 +155,112 @@ namespace simulator {
           idx;
       };
 
+#ifdef SYNC
+    auto range =
+      std::vector<std::size_t>(parameters->human_initial_susceptible);
+    std::iota(std::begin(range), std::end(range), 0UL);
+
+    std::for_each(std::execution::par_unseq, std::begin(range), std::end(range),
+                  insert_susceptible_human);
+    range = std::vector<std::size_t>(parameters->human_initial_exposed);
+    std::iota(std::begin(range), std::end(range), 0UL);
+    std::for_each(std::execution::par_unseq, std::begin(range), std::end(range),
+                  insert_exposed_human);
+    range = std::vector<std::size_t>(parameters->human_initial_infected);
+    std::iota(std::begin(range), std::end(range), 0UL);
+    std::for_each(std::execution::par_unseq, std::begin(range), std::end(range),
+                  insert_infected_human);
+    range = std::vector<std::size_t>(parameters->human_initial_recovered);
+    std::iota(std::begin(range), std::end(range), 0UL);
+    std::for_each(std::execution::par_unseq, std::begin(range), std::end(range),
+                  insert_recovered_human);
+    range = std::vector<std::size_t>(parameters->mosquito_initial_susceptible);
+    std::iota(std::begin(range), std::end(range), 0UL);
+    std::for_each(std::execution::par_unseq, std::begin(range), std::end(range),
+                  insert_susceptible_mosquito);
+    range = std::vector<std::size_t>(parameters->mosquito_initial_infected);
+    std::iota(std::begin(range), std::end(range), 0UL);
+    std::for_each(std::execution::par_unseq, std::begin(range), std::end(range),
+                  insert_infected_mosquito);
+    range = std::vector<std::size_t>(parameters->mosquito_initial_recovered);
+    std::iota(std::begin(range), std::end(range), 0UL);
+    std::for_each(std::execution::par_unseq, std::begin(range), std::end(range),
+                  insert_recovered_mosquito);
+#else
     const auto work = stdexec::when_all(
       stdexec::just() |
-        exec::on(gpu.get_scheduler(),
-                 stdexec::bulk(parameters->human_initial_susceptible,
-                               insert_susceptible_human)),
+        exec::on(
+  #ifdef INSERTION_CPU
+          cpu.get_scheduler()
+  #else
+          gpu.get_scheduler(nvexec::stream_priority::high)
+  #endif
+            ,
+          stdexec::bulk(parameters->human_initial_susceptible,
+                        insert_susceptible_human)),
       stdexec::just() |
-        exec::on(gpu.get_scheduler(),
-                 stdexec::bulk(parameters->human_initial_exposed,
-                               insert_exposed_human)),
+        exec::on(
+  #ifdef INSERTION_CPU
+          cpu.get_scheduler()
+  #else
+          gpu.get_scheduler(nvexec::stream_priority::high)
+  #endif
+            ,
+          stdexec::bulk(parameters->human_initial_exposed,
+                        insert_exposed_human)),
       stdexec::just() |
-        exec::on(gpu.get_scheduler(),
-                 stdexec::bulk(parameters->human_initial_infected,
-                               insert_infected_human)),
+        exec::on(
+  #ifdef INSERTION_CPU
+          cpu.get_scheduler()
+  #else
+          gpu.get_scheduler(nvexec::stream_priority::high)
+  #endif
+            ,
+          stdexec::bulk(parameters->human_initial_infected,
+                        insert_infected_human)),
       stdexec::just() |
-        exec::on(gpu.get_scheduler(),
-                 stdexec::bulk(parameters->human_initial_recovered,
-                               insert_recovered_human)),
+        exec::on(
+  #ifdef INSERTION_CPU
+          cpu.get_scheduler()
+  #else
+          gpu.get_scheduler(nvexec::stream_priority::high)
+  #endif
+            ,
+          stdexec::bulk(parameters->human_initial_recovered,
+                        insert_recovered_human)),
       stdexec::just() |
-        exec::on(gpu.get_scheduler(),
-                 stdexec::bulk(parameters->mosquito_initial_susceptible,
-                               insert_susceptible_mosquito)),
+        exec::on(
+  #ifdef INSERTION_CPU
+          cpu.get_scheduler()
+  #else
+          gpu.get_scheduler(nvexec::stream_priority::high)
+  #endif
+            ,
+          stdexec::bulk(parameters->mosquito_initial_susceptible,
+                        insert_susceptible_mosquito)),
       stdexec::just() |
-        exec::on(gpu.get_scheduler(),
-                 stdexec::bulk(parameters->mosquito_initial_infected,
-                               insert_infected_mosquito)),
+        exec::on(
+  #ifdef INSERTION_CPU
+          cpu.get_scheduler()
+  #else
+          gpu.get_scheduler(nvexec::stream_priority::high)
+  #endif
+            ,
+          stdexec::bulk(parameters->mosquito_initial_infected,
+                        insert_infected_mosquito)),
       stdexec::just() |
-        exec::on(gpu.get_scheduler(),
-                 stdexec::bulk(parameters->mosquito_initial_recovered,
-                               insert_recovered_mosquito)));
+        exec::on(
+  #ifdef INSERTION_CPU
+          cpu.get_scheduler()
+  #else
+          gpu.get_scheduler(nvexec::stream_priority::high)
+  #endif
+            ,
+          stdexec::bulk(parameters->mosquito_initial_recovered,
+                        insert_recovered_mosquito)));
 
     stdexec::sync_wait(std::move(work));
+#endif
   }
 
   auto Simulation::movement() noexcept -> void {
@@ -216,12 +294,28 @@ namespace simulator {
         std::get<1>((*agents_in_position)[position])[i] = i;
       };
 
+#ifdef SYNC
+    auto range = std::vector<std::size_t>(humans->size());
+    std::iota(std::begin(range), std::end(range), 0UL);
+    std::for_each(std::execution::par_unseq, std::begin(range), std::end(range),
+                  human_movement);
+    range = std::vector<std::size_t>(mosquitos->size());
+    std::iota(std::begin(range), std::end(range), 0UL);
+    std::for_each(std::execution::par_unseq, std::begin(range), std::end(range),
+                  mosquito_movement);
+#else
     const auto work = stdexec::transfer_when_all(
-      gpu.get_scheduler(),
+  #ifdef MOVEMENT_CPU
+      cpu.get_scheduler()
+  #else
+      gpu.get_scheduler(nvexec::stream_priority::high)
+  #endif
+        ,
       stdexec::just() | stdexec::bulk(humans->size(), human_movement),
       stdexec::just() | stdexec::bulk(mosquitos->size(), mosquito_movement));
 
     stdexec::sync_wait(std::move(work));
+#endif
   }
 
   auto Simulation::contact() noexcept -> void {
@@ -231,7 +325,7 @@ namespace simulator {
 
     auto generate_agents_in_position =
       [agents_set = agents_set.get(),
-       agents_in_position = agents_in_position.get()](auto i) mutable noexcept {
+       agents_in_position = agents_in_position.get()](auto i) mutable {
         std::copy_if(std::execution::seq,
                      std::begin(std::get<0>((*agents_in_position)[i])),
                      std::end(std::get<0>((*agents_in_position)[i])),
@@ -306,16 +400,38 @@ namespace simulator {
       exec::on(cpu.get_scheduler(),
                stdexec::bulk(environment->size, generate_agents_in_position));
 
+    stdexec::sync_wait(std::move(work1));
+
+#ifdef SYNC
+    auto range = std::vector<std::size_t>(environment->size);
+    std::iota(std::begin(range), std::end(range), 0UL);
+    std::for_each(std::execution::par_unseq, std::begin(range), std::end(range),
+                  human_mosquito_contact);
+    std::for_each(std::execution::par_unseq, std::begin(range), std::end(range),
+                  mosquito_mosquito_contact);
+#else
     const auto work2 = stdexec::when_all(
       stdexec::just() |
-        exec::on(gpu.get_scheduler(),
-                 stdexec::bulk(environment->size, human_mosquito_contact)),
+        exec::on(
+  #ifdef CONTACT_CPU
+          cpu.get_scheduler()
+  #else
+          gpu.get_scheduler(nvexec::stream_priority::high)
+  #endif
+            ,
+          stdexec::bulk(environment->size, human_mosquito_contact)),
       stdexec::just() |
-        exec::on(gpu.get_scheduler(),
-                 stdexec::bulk(environment->size, mosquito_mosquito_contact)));
+        exec::on(
+  #ifdef CONTACT_CPU
+          cpu.get_scheduler()
+  #else
+          gpu.get_scheduler(nvexec::stream_priority::high)
+  #endif
+            ,
+          stdexec::bulk(environment->size, mosquito_mosquito_contact)));
 
-    stdexec::sync_wait(std::move(work1));
     stdexec::sync_wait(std::move(work2));
+#endif
   }
 
   auto Simulation::transition() noexcept -> void {
@@ -385,15 +501,39 @@ namespace simulator {
       }
     };
 
+#ifdef SYNC
+    auto range = std::vector<std::size_t>(humans->size());
+    std::iota(std::begin(range), std::end(range), 0UL);
+    std::for_each(std::execution::par_unseq, std::begin(range), std::end(range),
+                  human_transition);
+
+    range = std::vector<std::size_t>(mosquitos->size());
+    std::iota(std::begin(range), std::end(range), 0UL);
+    std::for_each(std::execution::par_unseq, std::begin(range), std::end(range),
+                  mosquito_transition);
+#else
     const auto work = stdexec::when_all(
       stdexec::just() |
-        exec::on(gpu.get_scheduler(),
-                 stdexec::bulk(humans->size(), human_transition)),
+        exec::on(
+  #ifdef TRANSITION_CPU
+          cpu.get_scheduler()
+  #else
+          gpu.get_scheduler(nvexec::stream_priority::high)
+  #endif
+            ,
+          stdexec::bulk(humans->size(), human_transition)),
       stdexec::just() |
-        exec::on(gpu.get_scheduler(),
-                 stdexec::bulk(mosquitos->size(), mosquito_transition)));
+        exec::on(
+  #ifdef TRANSITION_CPU
+          cpu.get_scheduler()
+  #else
+          gpu.get_scheduler(nvexec::stream_priority::high)
+  #endif
+            ,
+          stdexec::bulk(mosquitos->size(), mosquito_transition)));
 
     stdexec::sync_wait(std::move(work));
+#endif
   }
 
   auto Simulation::output() noexcept -> const State& {
