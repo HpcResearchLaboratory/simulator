@@ -12,6 +12,8 @@ import argparse
 import json
 import matplotlib.pyplot as plt
 
+plt.rcParams.update({'font.size': 28})
+
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument("file", help="JSON file with benchmark results")
 parser.add_argument("--title", help="Plot Title")
