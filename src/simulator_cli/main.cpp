@@ -1,61 +1,82 @@
+#include "indicators/setting.hpp"
+#include <memory>
 #include <simulator/environment.hpp>
-#include <simulator/monte_carlo.hpp>
 #include <simulator/parameters.hpp>
-
 #include <simulator/simulation.hpp>
 #include <simulator/util/random.hpp>
 
 #include <filesystem>
 #include <fstream>
-#include <memory>
+#include <future>
+#include <iostream>
 #include <string>
+#include <vector>
+
+#include <argparse/argparse.hpp>
+#include <indicators/dynamic_progress.hpp>
+#include <indicators/progress_bar.hpp>
 
 namespace fs = std::filesystem;
 
-auto main() -> int {
-  const fs::path input_path = "./assets/input";
-  const fs::path output_path = "./assets/output";
+auto main(int argc, char* argv[]) -> int {
+  argparse::ArgumentParser program("simula", "v1.0.0");
 
-  auto environment_input_file = std::ifstream { input_path / "cascavel.json" };
-  auto parameters_input_file = std::ifstream { input_path / "parameters.json" };
+  program.add_argument("-i", "--input")
+    .help("Input directory")
+    .default_value(std::string("./assets/input"))
+    .action([](const std::string& value) -> fs::path { return value; });
 
-  const auto environment_data =
-    std::string { std::istreambuf_iterator<char> { environment_input_file },
-                  std::istreambuf_iterator<char> {} };
-  const auto parameters_data =
-    std::string { std::istreambuf_iterator<char> { parameters_input_file },
-                  std::istreambuf_iterator<char> {} };
+  program.add_argument("-o", "--output")
+    .help("Output directory")
+    .default_value(std::string("./assets/output"))
+    .action([](const std::string& value) -> fs::path { return value; });
 
-  auto environment = std::make_shared<const simulator::Environment>(
-    simulator::Environment::from_geojson(environment_data));
-  auto parameters = std::make_unique<const simulator::Parameters>(
-    simulator::Parameters::from_json(parameters_data));
+  try {
+    program.parse_args(argc, argv);
 
-  nvexec::multi_gpu_stream_context gpu_ctx;
-  exec::static_thread_pool cpu_ctx { std::thread::hardware_concurrency() };
-  auto simulation =
-    simulator::Simulation { environment, std::move(parameters),
-                            gpu_ctx.get_scheduler(), cpu_ctx.get_scheduler() };
+    const auto input_path = program.get<std::string>("--input");
+    const auto output_path = program.get<std::string>("--output");
 
-  simulation.run();
+    for (fs::path simulation_path : fs::directory_iterator(input_path)) {
+      auto environment_input_file =
+        std::ifstream { simulation_path / "environment.json" };
+      auto parameters_input_file =
+        std::ifstream { simulation_path / "parameters.json" };
 
-  // const auto simulations =
-  //   std::views::all(fs::directory_iterator(input_path / "simulations"));
-  // std::vector<std::future<void>> futures;
-  // for (const auto& simulation : simulations) {
-  //   auto fut = std::async(std::launch::async, [simulation, environment]() {
-  //     const auto parameters = simulator::Parameters::from_dir(simulation);
-  //     std::cout << parameters.blocks_count << std::endl;
-  //     const auto mc =
-  //       simulator::MonteCarlo { std::move(environment), std::move(parameters)
-  //       };
-  //     mc.run();
-  //   });
-  //   futures.push_back(std::move(fut));
-  // }
+      const auto environment_data =
+        std::string { std::istreambuf_iterator<char> { environment_input_file },
+                      std::istreambuf_iterator<char> {} };
+      const auto parameters_data =
+        std::string { std::istreambuf_iterator<char> { parameters_input_file },
+                      std::istreambuf_iterator<char> {} };
 
-  // for (auto& fut : futures) {
-  //   fut.wait();
-  // }
-  return 0;
+      const auto parameters = simulator::Parameters::from_json(parameters_data);
+
+      const auto environment =
+        simulator::Environment::from_geojson(environment_data);
+
+          auto simulation = simulator::Simulation(
+            std::make_shared<simulator::Environment>(environment),
+            std::make_shared<simulator::Parameters>(parameters));
+
+
+          simulation.run();
+
+          // get the simulation results and save them
+          const auto& results = simulation.get_states();
+          nlohmann::json json_results = results;
+
+          auto output_path_simulation =
+            output_path / simulation_path.filename() / "results.json";
+
+          fs::create_directories(output_path_simulation.parent_path());
+          std::ofstream output_file(output_path_simulation);
+          output_file << json_results.dump(2);
+          output_file.close();
+
+    }
+  } catch (const std::exception& e) {
+    std::cerr << e.what() << std::endl;
+    std::exit(EXIT_FAILURE);
+  }
 }

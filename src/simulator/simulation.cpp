@@ -65,11 +65,11 @@ namespace simulator {
 
     insertion();
     for (std::size_t i = 0; i < cycles; i++) {
-      /*std::cout << "Cycle: " << i << std::endl;*/
+      // std::cout << "Cycle: " << i << std::endl;
       movement();
       contact();
       transition();
-      /*auto _ = output();*/
+      auto _ = output();
     }
   }
 
@@ -80,7 +80,7 @@ namespace simulator {
 
     const auto insert_susceptible_human =
       [random_human_position, humans = humans.get(),
-       agents_in_position = agents_in_position.get()](auto i) mutable noexcept {
+       agents_in_position = agents_in_position.get()](unsigned long long i) mutable noexcept {
         const auto position = random_human_position(i);
         (*humans)[i] = Human { Human::State::Susceptible, i, position, 0 };
         std::get<0>((*agents_in_position)[position])[i] = i;
@@ -125,7 +125,7 @@ namespace simulator {
 
     const auto insert_susceptible_mosquito =
       [random_mosquito_position, mosquitos = this->mosquitos.get(),
-       agents_in_position = agents_in_position.get()](auto i) mutable noexcept {
+       agents_in_position = agents_in_position.get()](unsigned long long i) mutable noexcept {
         (*mosquitos)[i] = Mosquito { Mosquito::State::Susceptible, i,
                                      random_mosquito_position(i), 0 };
         std::get<1>((*agents_in_position)[(*mosquitos)[i].position])[i] = i;

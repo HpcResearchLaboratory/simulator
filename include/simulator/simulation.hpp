@@ -22,7 +22,7 @@ namespace simulator {
     std::shared_ptr<const Environment> environment;
     std::shared_ptr<const Parameters> parameters;
 
-    nvexec::multi_gpu_stream_context gpu;
+    nvexec::stream_context gpu;
     exec::static_thread_pool cpu;
 
     std::unique_ptr<std::vector<Human>> humans;

@@ -24,7 +24,7 @@ add_requires("cmake::NVHPC",
     system = true,
     configs = {
       envs = {
-        CMAKE_PREFIX_PATH = "/opt/nvidia/hpc_sdk/Linux_x86_64/24.3/cmake/",
+        CMAKE_PREFIX_PATH = "/opt/nvidia/hpc_sdk/Linux_x86_64/25.3/cmake/",
         CMAKE_CXX_FLAGS = "-std=c++23 -stdpar --experimental-stdpar"
       },
       components = {
@@ -106,6 +106,7 @@ end)
 
 -- [[ Project targets ]]
 target("simulator", function()
+  set_default(true)
   set_kind("static")
   add_files("src/simulator/*.cpp", "src/simulator/**/*.cpp")
   add_packages(table.unpack(simulator_deps))
@@ -117,6 +118,7 @@ end)
 
 
 target("simula_cli", function()
+  set_default(true)
   set_kind("binary")
   add_files("src/simula_cli/*.cpp")
   add_packages(table.unpack(simula_cli_deps))
@@ -127,7 +129,20 @@ target("simula_cli", function()
   add_runenvs("CUDA_VISIBLE_DEVICES", "$(gpus)")
 end)
 
+target("simulator_cli", function()
+  set_default(true)
+  set_kind("binary")
+  add_files("src/simulator_cli/*.cpp")
+  add_packages(table.unpack(simula_cli_deps))
+  add_deps("simulator")
+  set_targetdir("./simulator")
+  set_installdir("./simulator")
+  add_options("sync", "gpus", "insertion_cpu", "movement_cpu", "contact_cpu", "transition_cpu")
+  add_runenvs("CUDA_VISIBLE_DEVICES", "$(gpus)")
+end)
+
 target("bench", function()
+  set_default(true)
   set_kind("binary")
   add_files("src/bench/*.cpp")
   add_packages(table.unpack(bench_deps))
